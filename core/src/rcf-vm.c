@@ -8,6 +8,7 @@
 #include "rcf_opcode.h"
 #include "rcf_vault.h"
 #include "rcf_crypto.h"
+#include "rcf_bunker.h"
 #include "rcf_pilloff.h"
 #include <string.h>
 #include <stdio.h>
@@ -64,7 +65,11 @@ void rcf_vm_execute(const char* name, const uint8_t* bytecode, uint32_t size) {
 
             case OP_IDENTITY_GEN:
                 printf("> [IDENTITY] Regenerating node identity...\n");
-                // Call vault identity logic
+                rcf_bunker_enter();
+                // [PQC-KYBER-KEYGEN-START]
+                // Generates master key under Bunker Mode active shielding
+                // [PQC-KYBER-KEYGEN-END]
+                rcf_bunker_exit();
                 break;
 
             case OP_VFS_STORE:

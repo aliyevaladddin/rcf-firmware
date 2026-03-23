@@ -6,6 +6,7 @@
 
 #include "rcf_vault.h"
 #include "rcf_crypto.h"
+#include "rcf_bunker.h"
 #include "rcf_pilloff.h"
 #include "stm32f4xx_hal.h"
 
@@ -130,4 +131,29 @@ void vault_zeroize_all(void) {
     
     // Clear any key material in SRAM
     secure_memzero(&vault_header, sizeof(vault_header));
+}
+
+void rcf_vault_emergency_shutdown(void) {
+    // [RCF-START][M-VAULT-EMERGENCY]
+    // 1. Immediate RAM wipe (0.01 ms)
+    secure_memzero(&vault_header, sizeof(vault_header));
+    
+    // 2. Kill TRNG to protect against voltage-based leakage
+    __HAL_RNG_DISABLE(&hrng);
+
+    // 3. Destruct Backup SRAM (Timechain & Key Pointers)
+    __HAL_RCC_BKPSRAM_CLK_ENABLE();
+    memset((void*)BKPSRAM_BASE, 0x00, 4096); 
+    
+    // 4. Force Isolation (Disconnect interfaces)
+    __disable_irq(); 
+    
+    // 5. High-speed Flash Corruption (Overwrite Header)
+    // Faster than erase, kills integrity before power loss
+    HAL_FLASH_Unlock();
+    for(int i=0; i<32; i++) {
+        HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, VAULT_HEADER_ADDR + (i*4), 0x00000000);
+    }
+    HAL_FLASH_Lock();
+    // [RCF-END]
 }
