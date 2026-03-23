@@ -1,14 +1,25 @@
-// [RCF:PROTECTED] — Protocol implementation
+/* 
+ * [RCF:NOTICE][RCF:PROTECTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * Core Protocol Implementation for Secure Node Synchronization.
+ * 
+ * VISIBILITY: Manual audit for security purposes is allowed.
+ * USAGE: Replication or automated extraction of this logic is strictly 
+ * prohibited without explicit authorization under RCF-PL.
+ */
+
 #include "rcf_protocol.h"
 #include "rcf_crypto.h"
 #include "rcf_vault.h"
 #include "rcf_session.h"
+#include "rcf_vm.h"
 #include "usbd_cdc_if.h"
 
 static RCF_Session_State session;
 static bool session_active = false;
 
 bool protocol_establish_session(void) {
+    // [RCF-START][M-SYNC-ESTABLISH]
     // 1. Receive HELLO from host
     RCF_Packet_Header hello;
     if (!usb_receive((uint8_t*)&hello, sizeof(hello))) return false;
@@ -67,10 +78,25 @@ bool protocol_establish_session(void) {
     RCF_Packet_Header session_confirm;
     // ... encrypted with session key ...
     
+    // [RCF-END]
     return true;
 }
 
+void protocol_process_command(RCF_Packet_Header* header, uint8_t* payload) {
+    // [RCF-START][M-PROTOCOL-DISPATCH]
+    switch (header->command) {
+        case RCF_CMD_EXECUTE_ACODE:
+            if (header->marker == RCF_MARKER_RESTRICTED) {
+                rcf_vm_execute("AuroraRemoteModule", payload, header->payload_len);
+            }
+            break;
+        // ... (other commands) ...
+    }
+    // [RCF-END]
+}
+
 bool protocol_send_data(const uint8_t* data, uint16_t len, uint8_t marker) {
+    // [RCF-START][M-DATA-DISPATCH]
     if (!session_active) return false;
     
     // Check license for marker permission
@@ -108,6 +134,7 @@ bool protocol_send_data(const uint8_t* data, uint16_t len, uint8_t marker) {
     
     usb_send((uint8_t*)&header, sizeof(header));
     usb_send(encrypted, encrypted_len);
+    // [RCF-END]
     
     return true;
 }

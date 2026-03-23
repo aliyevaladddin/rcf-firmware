@@ -1,4 +1,9 @@
-// [RCF:RESTRICTED] — Timechain implementation
+/* 
+ * [RCF:NOTICE][RCF:RESTRICTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * Timechain Implementation & Anti-Rollback Protection.
+ */
+
 #include "rcf_timechain.h"
 #include "rcf_crypto.h"
 #include "rcf_pilloff.h"
@@ -15,6 +20,7 @@ static uint32_t last_lsi_measurement = 32000;
 static bool timechain_valid = false;
 
 bool timechain_init(void) {
+    // [RCF-START][M-TIME-INIT]
     // Enable Backup SRAM clock
     __HAL_RCC_BKPSRAM_CLK_ENABLE();
     
@@ -66,11 +72,13 @@ bool timechain_init(void) {
         trigger_pill_off(PILL_OFF_TAMPER_ROLLBACK);
         return false;
     }
+    // [RCF-END]
     
     return true;
 }
 
 bool timechain_update(void) {
+    // [RCF-START][M-TIME-UPDATE]
     if (!timechain_valid) return false;
     
     RTC_TimeTypeDef sTime;
@@ -115,11 +123,13 @@ bool timechain_update(void) {
     // Shift: current → previous, new → current
     memcpy((void*)TIMECHAIN_PREVIOUS, (void*)TIMECHAIN_CURRENT, sizeof(RCF_Timechain_Entry));
     memcpy((void*)TIMECHAIN_CURRENT, &new_entry, sizeof(RCF_Timechain_Entry));
+    // [RCF-END]
     
     return true;
 }
 
 bool timechain_detect_clock_anomaly(void) {
+    // [RCF-START][M-TIME-CLOCK-AUDIT]
     // Measure LSI frequency via HSE reference
     uint32_t lsi_freq = measure_lsi_frequency();
     
@@ -138,6 +148,7 @@ bool timechain_detect_clock_anomaly(void) {
     }
     
     last_lsi_measurement = lsi_freq;
+    // [RCF-END]
     return false;
 }
 

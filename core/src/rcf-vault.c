@@ -1,4 +1,9 @@
-// [RCF:RESTRICTED] — Vault implementation
+/* 
+ * [RCF:NOTICE][RCF:RESTRICTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * Secure Key Vault & Anti-Tamper Storage.
+ */
+
 #include "rcf_vault.h"
 #include "rcf_crypto.h"
 #include "rcf_pilloff.h"
@@ -79,11 +84,13 @@ bool vault_load_key(Vault_KeyType type, uint8_t* out_buffer, uint32_t* out_len) 
     // Copy to output (still in encrypted form — decryption happens in crypto module)
     memcpy(out_buffer, entry.key_data, entry.key_data[0]);
     *out_len = entry.key_data[0];
+    // [RCF-END]
     
     return true;
 }
 
 void vault_zeroize_all(void) {
+    // [RCF-START][M-VAULT-ZEROIZE]
     // Multi-pass overwrite before erase
     FLASH_EraseInitTypeDef erase;
     uint32_t error = 0;
@@ -107,6 +114,7 @@ void vault_zeroize_all(void) {
         HAL_RNG_GenerateRandomNumber(&hrng, &random);
         ptr[i] = random;
     }
+    // [RCF-END]
     
     // Final erase
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;

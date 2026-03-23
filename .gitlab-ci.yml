@@ -1,0 +1,14 @@
+stages:
+  - test
+
+rcf_compliance_check:
+  stage: test
+  tags:
+    - Windows-Fresh-Runner
+  before_script:
+    - python -m pip install git+https://github.com/aliyevaladddin/rcf-protocol.git#subdirectory=sdk/python
+  script:
+    - rcf-cli check .
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

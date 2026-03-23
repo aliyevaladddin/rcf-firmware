@@ -1,9 +1,15 @@
-// [RCF:RESTRICTED] — Vault module header
+/* 
+ * [RCF:NOTICE][RCF:RESTRICTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * Secure Key Vault & Anti-Tamper Storage Definitions.
+ */
+
 #ifndef RCF_VAULT_H
 #define RCF_VAULT_H
 
 #include "rcf_config.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
     VAULT_KEY_DEVICE_PRIV     = 0,   // Curve25519 static key

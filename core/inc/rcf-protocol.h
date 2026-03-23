@@ -1,4 +1,9 @@
-// [RCF:PROTECTED] — RCF Protocol header
+/* 
+ * [RCF:NOTICE][RCF:PROTECTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * RCF Protocol definitions and exchange formats.
+ */
+
 #ifndef RCF_PROTOCOL_H
 #define RCF_PROTOCOL_H
 
@@ -13,6 +18,7 @@
 #define RCF_CMD_SESSION         0x04
 #define RCF_CMD_DATA            0x05
 #define RCF_CMD_AUDIT           0x06
+#define RCF_CMD_EXECUTE_ACODE   0x10
 #define RCF_CMD_PILL_OFF        0xFF
 
 // Markers for data classification

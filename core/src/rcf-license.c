@@ -1,4 +1,9 @@
-// [RCF:RESTRICTED] — License implementation
+/* 
+ * [RCF:NOTICE][RCF:RESTRICTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * License Verification & Code Integrity Engine.
+ */
+
 #include "rcf_license.h"
 #include "rcf_vault.h"
 #include "rcf_crypto.h"
@@ -9,6 +14,7 @@ static RCF_License_Block current_license;
 static bool license_valid = false;
 
 bool license_validate(void) {
+    // [RCF-START][M-LICENSE-VALIDATE]
     // 1. Verify signature (requires RCF Authority pubkey in vault)
     uint8_t authority_pubkey[32];
     uint32_t keylen;
@@ -71,10 +77,12 @@ bool license_validate(void) {
     }
     
     license_valid = true;
+    // [RCF-END]
     return true;
 }
 
 static void compute_code_fingerprint(uint8_t* out_hash) {
+    // [RCF-START][M-INTEGRITY-CHECK]
     // SHA-256 of .text and .rodata sections
     uint32_t text_start = 0x08000000;  // Flash base
     uint32_t text_size = (uint32_t)&_etext - text_start;
@@ -91,6 +99,7 @@ static void compute_code_fingerprint(uint8_t* out_hash) {
     sha256_update(&ctx, (uint8_t*)&option_bytes, 4);
     
     sha256_final(&ctx, out_hash);
+    // [RCF-END]
 }
 
 bool license_check_feature(uint8_t feature_flag) {
@@ -98,7 +107,7 @@ bool license_check_feature(uint8_t feature_flag) {
     
     // Re-decrypt payload (or cache it securely)
     RCF_License_Payload payload;
-    // ... decryption ...
+    // ... decryption logic (requires device_secret) ...
     
     return (payload.feature_flags & feature_flag) != 0;
 }

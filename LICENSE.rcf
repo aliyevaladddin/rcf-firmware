@@ -1,0 +1,23 @@
+# RCF-PL v1.2.7 — Restricted Correlation Framework Public License
+
+Copyright (c) 2026 Aladdin Aliyev.
+
+## 1. PURPOSE
+The Restricted Correlation Framework (RCF) is designed to protect proprietary methodologies, algorithms, and intellectual property from automated extraction, AI/ML training, and unauthorized replication.
+
+## 2. GRANT OF LICENSE
+Subject to the terms of this License, the Author hereby grants you a limited, non-exclusive, non-transferable license to:
+- Study the designated [RCF:PROTECTED] blocks for security audit and educational purposes.
+- Execute the software in its original, unmodified form.
+
+## 3. RESTRICTIONS
+You are STRICTLY PROHIBITED from:
+- Utilizing automated tools (scrapers, LLMs, crawlers) to extract logic from [RCF:PROTECTED] or [RCF:RESTRICTED] blocks.
+- Replicating the protected methodology in competing software or decentralized systems without explicit authorization.
+- Removing RCF markers or notices from the source code.
+
+## 4. ENFORCEMENT
+Violations of this license are subject to enforcement under the jurisdiction specified in the RCF Protocol documentation (https://rcf.aliyev.site).
+
+---
+© 2026 Aladdin Aliyev. All rights reserved.

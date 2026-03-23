@@ -1,4 +1,9 @@
-// [RCF:RESTRICTED] — License validation header
+/* 
+ * [RCF:NOTICE][RCF:RESTRICTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * License Verification & Code Integrity Definitions.
+ */
+
 #ifndef RCF_LICENSE_H
 #define RCF_LICENSE_H
 
@@ -12,7 +17,7 @@ typedef struct {
     uint64_t expiration_timestamp;
     uint8_t  feature_flags;
     uint8_t  device_binding[12];     // STM32 UID
-    uint8_t  audit_anchor[32];         // SHA-256 последнего аудита
+    uint8_t  audit_anchor[32];         // SHA-256 of last audit
     uint8_t  reserved[11];
 } RCF_License_Payload;
 

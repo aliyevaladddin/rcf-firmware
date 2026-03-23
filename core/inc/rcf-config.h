@@ -1,4 +1,9 @@
-// [RCF:PUBLIC] — Build-time configuration
+/* 
+ * [RCF:NOTICE][RCF:PUBLIC]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * Build-time Configuration and Protection Parameters.
+ */
+
 #ifndef RCF_CONFIG_H
 #define RCF_CONFIG_H
 

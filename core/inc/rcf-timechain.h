@@ -1,4 +1,9 @@
-// [RCF:RESTRICTED] — Secure time header
+/* 
+ * [RCF:NOTICE][RCF:RESTRICTED]
+ * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * Secure Timechain & Anti-Rollback Protection Definitions.
+ */
+
 #ifndef RCF_TIMECHAIN_H
 #define RCF_TIMECHAIN_H
 
