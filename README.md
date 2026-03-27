@@ -1,32 +1,47 @@
-# RCF Firmware Core — Decentralized Node Protection
+# Aurora Access — RCF Firmware Core
 
-**Version:** 0.1.0-alpha  
-**License:** RCF-PL v1.2.7 (Restricted Correlation Framework)  
+**Version:** v1.2.9 (Alpha)  
+**Protocol:** RCF-PL v1.2.8 (Restricted Correlation Framework)  
 **Registry:** [rcf.aliyev.site](https://rcf.aliyev.site)
 
 ---
 
-## 🛡️ What is this?
+## 🛡️ Overview
 
-This is the core firmware for the dOS (Decentralized Operating System) ecosystem, specifically designed for high-security node coordination. 
+**Aurora Access** is the secure hardware root-of-trust for the dOS (Decentralized Operating System) ecosystem. It is specifically designed for high-security node coordination and tamper-resistant execution.
 
-This project is governed by the **Restricted Correlation Framework (RCF)**. It is **Visible Source**, meaning you can study the code, but you cannot replicate the core methodologies without an RCF-PL license.
+This project is governed by the **Restricted Correlation Framework (RCF)**. It is **Visible Source**, meaning architectural study is encouraged, but core methodologies are protected under the RCF-PL license.
+
+## 🚀 Key Features
+
+- **A-VM (Aurora Virtual Machine)**: Secure execution engine for signed `.acode` modules.
+- **PQC Security**: Post-Quantum Cryptographic verification using **Dilithium2**.
+- **Embedded Modules**: Filesystem-independent boot modules (Heartbeat, Identity) embedded directly as static C arrays.
+- **EHA Protocol (v1.2.9)**: Standardized **External Hardware Abstraction** for peripheral connectivity (Flash cards, SD/MMC).
+- **RCF Bunker**: Isolated shielding mode for sensitive cryptographic operations.
 
 ## 🧩 Project Structure
 
-- `core/Src/` — Firmware logic (Protected).
-- `core/Inc/` — Header definitions.
-- `LICENSE.rcf` — The RCF-PL legal agreement.
-- `.gitlab-ci.yml` — Automated compliance checking.
+- `AuroraAccess/core/src/` — Proprietary firmware logic.
+- `AuroraAccess/core/inc/` — Hardware & Protocol headers.
+- `AuroraAccess/modules/` — Binary `.acode` source modules.
+- `AuroraAccess/DOCUMENTATION/` — Technical specs (EHA, Security, API).
+- `build/Makefile` — Standardized build system (STM32F407 Reference).
 
-## 🚀 Compliance & Security
+## 🛠️ Compliance & Audit
 
-We use the `rcf-cli` suite to ensure all proprietary logic is correctly marked and tracked.
+We enforce a strict **100% compliance** policy using the `rcf-cli` suite.
 
 ### Check Compliance Locally
 ```bash
 pip install rcf-cli  # or install from rcf-protocol repo
-rcf-cli check .
+rcf-cli check AuroraAccess/
+```
+
+### Build Firmware
+```bash
+cd build
+make
 ```
 
 ---
