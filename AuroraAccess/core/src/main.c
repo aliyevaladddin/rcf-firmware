@@ -1,3 +1,8 @@
+/* 
+ * [RCF:NOTICE][RCF:PUBLIC]
+ * NOTICE: This file is protected under RCF-PL v1.2.8
+ * Main entry point — Lume Firmware.
+ */
 // [RCF:PUBLIC] — Main entry point
 #include "main.h"
 #include "rcf_config.h"
@@ -8,6 +13,9 @@
 #include "rcf_pulse.h"
 #include "rcf_led.h"
 #include "rcf_pilloff.h"
+#include "rcf_modules.h"
+#include "rcf_vm.h"
+
 
 int main(void) {
     // HAL initialization
@@ -17,6 +25,8 @@ int main(void) {
     // LED initialization (immediate user feedback)
     led_init();
     led_set_pattern(PATTERN_BOOT);
+    rcf_vm_execute("BOOT_IDENTITY", ACODE_IDENTITY, ACODE_IDENTITY_SIZE);
+
     
     // TRNG initialization (critical for security)
     hrng.Instance = RNG;

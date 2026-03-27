@@ -1,3 +1,4 @@
+<!-- NOTICE: This file is protected under RCF-PL v1.2.8 -->
 # RCF Integration Guide — Firmware Implementation
 
 This document describes how the Restricted Correlation Framework (RCF) is integrated into this firmware codebase.

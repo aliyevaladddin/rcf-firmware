@@ -1,3 +1,4 @@
+<!-- NOTICE: This file is protected under RCF-PL v1.2.8 -->
 # API Reference — RCF Firmware Modules
 
 Detailed documentation for the core functional modules of the RCF-protected firmware.

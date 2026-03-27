@@ -26,19 +26,24 @@ LDFLAGS = -TSTM32F407VGTx_FLASH.ld
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += -Wl,-Map=$(TARGET).map
 
+# Include paths
+CFLAGS += -IAuroraAccess/core/inc
+CFLAGS += -IAuroraAccess/core/inc/hal
+
 # Source files
 SRCS = \
-    Core/Src/main.c \
-    Core/Src/system_stm32f4xx.c \
-    Core/Src/rcf_vault.c \
-    Core/Src/rcf_timechain.c \
-    Core/Src/rcf_license.c \
-    Core/Src/rcf_crypto.c \
-    Core/Src/rcf_protocol.c \
-    Core/Src/rcf_audit.c \
-    Core/Src/rcf_pulse.c \
-    Core/Src/rcf_led.c \
-    Core/Src/rcf_pilloff.c \
+    AuroraAccess/core/src/main.c \
+    AuroraAccess/core/src/rcf_vault.c \
+    AuroraAccess/core/src/rcf_timechain.c \
+    AuroraAccess/core/src/rcf_license.c \
+    AuroraAccess/core/src/rcf_crypto.c \
+    AuroraAccess/core/src/rcf_protocol.c \
+    AuroraAccess/core/src/rcf_audit.c \
+    AuroraAccess/core/src/rcf_pulse.c \
+    AuroraAccess/core/src/rcf_led.c \
+    AuroraAccess/core/src/rcf_pilloff.c \
+    AuroraAccess/core/src/rcf_vm.c \
+    AuroraAccess/core/src/rcf_modules.c \
     # ... HAL sources ...
 
 # Build rules

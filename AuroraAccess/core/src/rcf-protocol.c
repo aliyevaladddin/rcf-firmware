@@ -1,6 +1,6 @@
 /* 
  * [RCF:NOTICE][RCF:PROTECTED]
- * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * NOTICE: This file is protected under RCF-PL v1.2.8
  * Core Protocol Implementation for Secure Node Synchronization.
  * 
  * VISIBILITY: Manual audit for security purposes is allowed.

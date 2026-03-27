@@ -1,6 +1,6 @@
 /* 
  * [RCF:NOTICE][RCF:PUBLIC]
- * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * NOTICE: This file is protected under RCF-PL v1.2.8
  * Build-time Configuration and Protection Parameters.
  */
 

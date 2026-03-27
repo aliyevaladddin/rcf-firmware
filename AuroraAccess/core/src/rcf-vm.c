@@ -1,6 +1,6 @@
 /* 
  * [RCF:NOTICE][RCF:RESTRICTED]
- * RCF-PL v1.2.7 — Restricted Correlation Framework
+ * NOTICE: This file is protected under RCF-PL v1.2.8
  * Aurora Virtual Machine (A-VM) — STM32F4 Implementation.
  */
 
@@ -84,6 +84,25 @@ void rcf_vm_execute(const char* name, const uint8_t* bytecode, uint32_t size) {
 
             case OP_BUS_PUB:
                 printf("> [BUS/SPI] Event published to hardware bus.\n");
+                break;
+
+            case OP_EXT_MOUNT:
+                printf("> [EHA] Mounting external card (Slot %d)...\n", actual_code[ip++]);
+                // Call HAL_SD_Init or similar
+                break;
+
+            case OP_EXT_READ:
+                printf("> [EHA] Reading external block (LBA: %d)...\n", actual_code[ip++]);
+                // Call HAL_SD_ReadBlocks
+                break;
+
+            case OP_EXT_WRITE:
+                printf("> [EHA] Writing external block (LBA: %d)...\n", actual_code[ip++]);
+                // Call HAL_SD_WriteBlocks
+                break;
+
+            case OP_EXT_STATUS:
+                printf("> [EHA] Connection state: NOMINAL.\n");
                 break;
 
             case OP_PULSE_EMIT:

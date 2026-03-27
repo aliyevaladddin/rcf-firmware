@@ -1,4 +1,5 @@
-rcf-lume-firmware/
+<!-- NOTICE: This file is protected under RCF-PL v1.2.8 -->
+# RCF-LUME-FIRMWARE ROADMAP
 ├── Core/
 │   ├── Inc/
 │   │   ├── main.h                    # [RCF:PUBLIC] Entry point
