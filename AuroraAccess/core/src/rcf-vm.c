@@ -86,23 +86,70 @@ void rcf_vm_execute(const char* name, const uint8_t* bytecode, uint32_t size) {
                 printf("> [BUS/SPI] Event published to hardware bus.\n");
                 break;
 
-            case OP_EXT_MOUNT:
-                printf("> [EHA] Mounting external card (Slot %d)...\n", actual_code[ip++]);
-                // Call HAL_SD_Init or similar
+            case OP_EXT_MOUNT: {
+                uint8_t slot = actual_code[ip++];
+                printf("> [RCF:HW] Mounting external card (Slot %d)...\n", slot);
+                
+                /* [RCF:RESTRICTED] Hardware Execution */
+                #ifdef USE_HAL_DRIVER
+                extern SD_HandleTypeDef hsd; // Assuming global SD handle
+                if (HAL_SD_Init(&hsd) != HAL_OK) {
+                    printf("> [RCF:HW] ERROR: Physical mount failed.\n");
+                    // System error handling
+                } else {
+                    printf("> [RCF:HW] SUCCESS: SD Card initialized.\n");
+                }
+                #endif
                 break;
+            }
 
-            case OP_EXT_READ:
-                printf("> [EHA] Reading external block (LBA: %d)...\n", actual_code[ip++]);
-                // Call HAL_SD_ReadBlocks
+            case OP_EXT_READ: {
+                uint32_t lba = (actual_code[ip] << 24) | (actual_code[ip+1] << 16) | 
+                               (actual_code[ip+2] << 8) | actual_code[ip+3];
+                ip += 4;
+                uint16_t blocks = (actual_code[ip] << 8) | actual_code[ip+1];
+                ip += 2;
+                printf("> [RCF:HW] Reading external block (LBA: %u, Count: %u)...\n", lba, blocks);
+                
+                #ifdef USE_HAL_DRIVER
+                extern SD_HandleTypeDef hsd;
+                uint8_t temp_buf[512]; 
+                if (HAL_SD_ReadBlocks(&hsd, temp_buf, lba, blocks, 1000) != HAL_OK) {
+                    printf("> [RCF:HW] ERROR: Read failure at sector %u.\n", lba);
+                }
+                #endif
                 break;
+            }
 
-            case OP_EXT_WRITE:
-                printf("> [EHA] Writing external block (LBA: %d)...\n", actual_code[ip++]);
-                // Call HAL_SD_WriteBlocks
+            case OP_EXT_WRITE: {
+                uint32_t lba = (actual_code[ip] << 24) | (actual_code[ip+1] << 16) | 
+                               (actual_code[ip+2] << 8) | actual_code[ip+3];
+                ip += 4;
+                uint16_t blocks = (actual_code[ip] << 8) | actual_code[ip+1];
+                ip += 2;
+                printf("> [RCF:HW] Writing external block (LBA: %u, Count: %u)...\n", lba, blocks);
+
+                #ifdef USE_HAL_DRIVER
+                extern SD_HandleTypeDef hsd;
+                uint8_t temp_buf[512]; 
+                if (HAL_SD_WriteBlocks(&hsd, temp_buf, lba, blocks, 1000) != HAL_OK) {
+                    printf("> [RCF:HW] ERROR: Write failure at sector %u.\n", lba);
+                }
+                #endif
                 break;
+            }
 
             case OP_EXT_STATUS:
-                printf("> [EHA] Connection state: NOMINAL.\n");
+                #ifdef USE_HAL_DRIVER
+                extern SD_HandleTypeDef hsd;
+                if (HAL_SD_GetState(&hsd) == HAL_SD_STATE_READY) {
+                    printf("> [RCF:HW] Connection state: READY (Nominal).\n");
+                } else {
+                    printf("> [RCF:HW] Connection state: OFFLINE or BUSY.\n");
+                }
+                #else
+                printf("> [RCF:HW] Connection state: SIMULATED (Nominal).\n");
+                #endif
                 break;
 
             case OP_PULSE_EMIT:

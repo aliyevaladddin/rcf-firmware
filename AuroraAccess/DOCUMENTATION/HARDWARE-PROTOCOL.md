@@ -1,13 +1,13 @@
-# RCF Hardware Abstraction Protocol (EHA) v1.2.9
+# RCF Hardware Protocol v1.2.9
 
 ## 1. Overview
-The **External Hardware Abstraction (EHA)** protocol extends the Restricted Correlation Framework (RCF) to the machine level. It provides a standardized set of A-VM opcodes that allow signed modules to interact with physical peripherals (Flash cards, SD/MMC, SPI-Storage) without requiring hardware-specific drivers.
+The **RCF Hardware Protocol** extends the Restricted Correlation Framework (RCF) to the machine level. It provides a standardized set of A-VM opcodes that allow signed modules to interact with physical peripherals (Flash cards, SD/MMC, SPI-Storage) without requiring hardware-specific drivers.
 
 ## 2. Security Model
 Hardware access is governed by the RCF-PL license.
-- **RESTRICTED**: Only modules with `EXT_HW_ACCESS` permission in their manifest can execute EHA opcodes.
+- **RESTRICTED**: Only modules with `EXT_HW_ACCESS` permission in their manifest can execute hardware opcodes.
 - **AUDITED**: Every hardware mount and block operation is logged to the `rcf-audit` trail.
-- **ENCRYPTED**: The firmware can optionally wrap EHA operations with `rcf-vault` encryption layers.
+- **ENCRYPTED**: The firmware can optionally wrap hardware operations with `rcf-vault` encryption layers.
 
 ## 3. OpCode Specification (Range 0x30 - 0x3F)
 
@@ -26,4 +26,4 @@ On the STM32F407VG (Lume Reference Hardware):
 - Sector size is fixed at **512 bytes** for protocol consistency.
 
 ## 5. Compliance
-All EHA-compliant drivers must include the RCF-PL v1.2.8 header and pass the `rcf-cli` integrity audit.
+All hardware-compliant drivers must include the RCF-PL v1.2.8 header and pass the `rcf-cli` integrity audit.

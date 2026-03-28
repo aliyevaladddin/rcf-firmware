@@ -26,7 +26,7 @@
 #define OP_BUS_PUB           0x20
 #define OP_BUS_SUB           0x21
 
-/* ───── External Hardware (EHA) ───── */
+/* ───── RCF Hardware Protocol ───── */
 #define OP_EXT_MOUNT         0x30  // Initialize & Mount (SD/MMC)
 #define OP_EXT_READ          0x31  // Read Block (LBA)
 #define OP_EXT_WRITE         0x32  // Write Block (LBA)
