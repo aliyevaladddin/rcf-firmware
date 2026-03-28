@@ -1,4 +1,4 @@
-# Aurora Access — RCF Firmware Core
+# RCF Firmware — Aurora Access Ecosystem
 
 **Version:** v1.2.9 (Alpha)  
 **Protocol:** RCF-PL v1.2.8 (Restricted Correlation Framework)  
@@ -8,7 +8,7 @@
 
 ## 🛡️ Overview
 
-**Aurora Access** is the secure hardware root-of-trust for the dOS (Decentralized Operating System) ecosystem. It is specifically designed for high-security node coordination and tamper-resistant execution.
+**RCF Firmware** is the secure hardware root-of-trust for the **Aurora Access** ecosystem and the dOS (Decentralized Operating System). It is specifically designed for high-security node coordination and tamper-resistant execution.
 
 This project is governed by the **Restricted Correlation Framework (RCF)**. It is **Visible Source**, meaning architectural study is encouraged, but core methodologies are protected under the RCF-PL license.
 
