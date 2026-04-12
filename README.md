@@ -4,15 +4,30 @@
 
 [![RCF Protected](https://img.shields.io/badge/license-RCF--PL%20v1.3-7F77DD?style=flat-square)](../../LICENSE)
 [![Status](https://img.shields.io/badge/status-active-1D9E75?style=flat-square)]()
-[![Target](https://img.shields.io/badge/target-ARM64%20%7C%20STM32-534AB7?style=flat-square)]()
+# RCF-Firmware: LUME (v1.3 RC2-LS)
 
----
+[![Build Status](https://github.com/aladdinaliyev/rcf-firmware/actions/workflows/main.yml/badge.svg)](https://github.com/aladdinaliyev/rcf-firmware/actions)
+[![License: RCF-PL v1.3](https://img.shields.io/badge/License-RCF--PL%20v1.3-blue.svg)](LICENSE)
 
-## Overview
+**LUME** — это hardened-прошивка стандарта **Restricted Correlation Framework**, разработанная для узлов **Aurora Access**. Версия v1.3 RC2-LS (Life Support) спроектирована для работы на STM32F407 в режиме максимальной изоляции и защиты от взлома.
 
-**RCF Firmware** is the secure hardware root-of-trust for the **Aurora Access** ecosystem and the **dOS** (Decentralized Operating System). It is designed for high-security node coordination and tamper-resistant execution on embedded hardware.
+## 🚀 Текущий статус: RC2-LS
+- **Core:** Bare-metal STM32F4 implementation.
+- **Security:** Hardware-backed Vault, Timechain Anti-Rollback, A-VM Bytecode Interpreter.
+- **Verification:** 100% Green on QEMU CI tests.
 
-This project is governed by the **Restricted Correlation Framework (RCF)**. It is **Visible Source** — architectural study is encouraged, but core methodologies are protected under [RCF-PL v1.3](../../LICENSE).
+## 📚 Документация
+- **[RCF-SPEC](DOCUMENTATION/RCF-SPECIFICATION.md)** — Мастер-спецификация протокола v1.3.
+- **[Hardware Protocol](DOCUMENTATION/HARDWARE-PROTOCOL.md)** — Спецификация обмена данными Host <-> Device.
+- **[A-VM Opcodes](DOCUMENTATION/AURORA-VM-OPCODES.md)** — Справочник команд виртуальной машины Aurora.
+- **[Security Model](DOCUMENTATION/SECURITY-MODEL.md)** — Подробное описание уровней защиты.
+
+## 🛠 Сборка
+```bash
+make clean
+make RC2
+```
+Генерирует `.build/rcf-lume-rc2.bin` для прошивки.
 
 ---
 
