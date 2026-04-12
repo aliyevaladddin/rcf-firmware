@@ -90,10 +90,12 @@ static inline uint32_t HAL_GetUIDw1(void) { return 0xABCDEF01; }
 static inline uint32_t HAL_GetUIDw2(void) { return 0xBADC0FFE; }
 
 /* RNG */
-void HAL_RNG_Init(RNG_HandleTypeDef* phrng);
-void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* phrng, uint32_t* random32);
-void __HAL_RNG_ENABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
-void __HAL_RNG_DISABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
+void HAL_RNG_Init(RNG_HandleTypeDef* hrng);
+void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* hrng, uint32_t* random32);
+
+/* [FIX] Use static inline to avoid redefinition errors */
+static inline void __HAL_RNG_ENABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
+static inline void __HAL_RNG_DISABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
 
 /* IWDG */
 typedef struct { void* Instance; } IWDG_HandleTypeDef;
@@ -106,7 +108,7 @@ void HAL_RTC_GetDate(RTC_HandleTypeDef* phrtc, RTC_DateTypeDef* sDate, uint32_t 
 /* Clock macros (CI stubs) */
 #define __HAL_RCC_BKPSRAM_CLK_ENABLE()  ((void)0)
 #define __HAL_RCC_RTC_ENABLE()          ((void)0)
-#define __HAL_RTC_IS_INITIALIZED(hrtc)  (true)
+#define __HAL_RTC_IS_INITIALIZED(phrtc)  (true)
 
 /* Mock UART/Printf support */
 #include <stdio.h>

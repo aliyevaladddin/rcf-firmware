@@ -73,10 +73,8 @@ void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* phrng, uint32_t* random32) 
     *random32 = seed;
 }
 
-void __HAL_RNG_ENABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
-void __HAL_RNG_DISABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
-
 void HAL_IWDG_Refresh(IWDG_HandleTypeDef* hiwdg) { (void)hiwdg; }
+
 
 /* RTC Stubs */
 void HAL_RTC_GetTime(RTC_HandleTypeDef* phrtc, RTC_TimeTypeDef* sTime, uint32_t Format) {
