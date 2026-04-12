@@ -15,7 +15,14 @@
 #define RTC             ((RTC_TypeDef*)0x40002800)
 #define TIM5            ((TIM_TypeDef*)0x40000C00)
 
-#define HAL_OK          0x00
+/* HAL Status */
+typedef enum {
+    HAL_OK      = 0x00,
+    HAL_ERROR   = 0x01,
+    HAL_BUSY    = 0x02,
+    HAL_TIMEOUT = 0x03
+} HAL_StatusTypeDef;
+
 #define RTC_FORMAT_BIN  0x00000000U
 
 /* Forward declarations */
@@ -42,8 +49,8 @@ typedef struct {
     uint32_t SR;
     uint32_t EGR;
     uint32_t CCMR1;
-    uint32_t CCMR2;   /* Used in timechain */
-    uint32_t CCER;    /* Used in timechain */
+    uint32_t CCMR2;
+    uint32_t CCER;
     uint32_t CNT;
     uint32_t PSC;
     uint32_t ARR;
@@ -51,7 +58,7 @@ typedef struct {
     uint32_t CCR1;
     uint32_t CCR2;
     uint32_t CCR3;
-    uint32_t CCR4;    /* Capture/Compare register used in timechain */
+    uint32_t CCR4;
 } TIM_TypeDef;
 
 #define TIM_CCER_CC4E       (1U << 12)
@@ -91,7 +98,7 @@ static inline uint32_t HAL_GetUIDw2(void) { return 0xBADC0FFE; }
 
 /* RNG */
 void HAL_RNG_Init(RNG_HandleTypeDef* hrng);
-void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* hrng, uint32_t* random32);
+HAL_StatusTypeDef HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* hrng, uint32_t* random32);
 
 /* [FIX] Use static inline to avoid redefinition errors */
 static inline void __HAL_RNG_ENABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }

@@ -17,6 +17,12 @@
 #include <string.h>
 #include <stddef.h>
 
+/* Forward declarations for timechain helpers implemented in hal_stubs.c */
+uint64_t rtc_to_unix(RTC_TimeTypeDef sTime, RTC_DateTypeDef sDate);
+int16_t  get_internal_temperature(void);
+uint32_t get_vbat_voltage(void);
+
+
 /* ─── Backup SRAM layout ─────────────────────────────────────────────────── */
 
 #define BACKUP_SRAM_BASE    ((volatile uint8_t*)RCF_BACKUP_SRAM_ADDR)
