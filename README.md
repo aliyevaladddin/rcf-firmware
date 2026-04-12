@@ -30,7 +30,7 @@ This project is governed by the **Restricted Correlation Framework (RCF)**. It i
 - `AuroraAccess/core/src/` — Proprietary firmware logic.
 - `AuroraAccess/core/inc/` — Hardware & Protocol headers.
 - `AuroraAccess/modules/` — Binary `.acode` source modules.
-- `AuroraAccess/DOCUMENTATION/` — Technical specs ([RCF Hardware Protocol](file:///Users/aladdinaliyev/Library/CloudStorage/Dropbox/Aladdin/rcf-firmware/AuroraAccess/DOCUMENTATION/HARDWARE-PROTOCOL.md), [SDIO](file:///Users/aladdinaliyev/Library/CloudStorage/Dropbox/Aladdin/rcf-firmware/AuroraAccess/DOCUMENTATION/SDIO-SPEC.md), [SPI](file:///Users/aladdinaliyev/Library/CloudStorage/Dropbox/Aladdin/rcf-firmware/AuroraAccess/DOCUMENTATION/SPI-SPEC.md), [UART](file:///Users/aladdinaliyev/Library/CloudStorage/Dropbox/Aladdin/rcf-firmware/AuroraAccess/DOCUMENTATION/UART-SPEC.md)).
+- `AuroraAccess/DOCUMENTATION/` — Technical specs ([RCF Hardware Protocol](AuroraAccess/DOCUMENTATION/HARDWARE-PROTOCOL.md), [SDIO](AuroraAccess/DOCUMENTATION/SDIO-SPEC.md), [SPI](AuroraAccess/DOCUMENTATION/SPI-SPEC.md), [UART](AuroraAccess/DOCUMENTATION/UART-SPEC.md)).
 - `build/Makefile` — Standardized build system (STM32F407 Reference).
 
 ## 🛠️ Compliance & Audit
