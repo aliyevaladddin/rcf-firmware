@@ -41,14 +41,10 @@ ASM_SOURCES = startup_stm32f407xx.s
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 
-# [RCF v1.3] Hardened RC2 Target — Permanent Fix
+# [RCF v1.3] Hardened RC2 Target — Fixed
 RC2:
 	$(MAKE) TARGET=rcf-lume-rc2 CFLAGS="$(CFLAGS) -DRCF_VM_CI_MODE=1 -DRCF_LIFE_SUPPORT=1" clean all check-mpk
 	@echo "[RCF] Hardened RC2 Build Complete: rcf-lume-rc2.bin"
-
-
-
-	@arm-none-eabi-size $(BUILD_DIR)/$(TARGET).elf
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
