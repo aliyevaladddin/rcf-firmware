@@ -22,7 +22,14 @@ int main(void) {
     HAL_Init();
     SystemClock_Config();
     
+    // [RCF v1.3] CI/QEMU Boot Signal
+    #ifdef RCF_VM_DEBUG
+    printf("\n--- RCF v1.3 Mil-Spec Hardened Boot ---\n");
+    printf("Status: Initializing A-VM & Vault...\n");
+    #endif
+
     // LED initialization (immediate user feedback)
+
     led_init();
     led_set_pattern(PATTERN_BOOT);
     rcf_vm_execute("BOOT_IDENTITY", ACODE_IDENTITY, ACODE_IDENTITY_SIZE);

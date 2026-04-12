@@ -1,6 +1,6 @@
 /* 
  * [RCF:NOTICE][RCF:RESTRICTED]
- * NOTICE: This file is protected under RCF-PL v1.2.8
+ * NOTICE: This file is protected under RCF-PL v1.3
  * A-Code (Aurora Native Bytecode) OpCode Definitions.
  */
 
@@ -49,5 +49,8 @@
 
 /* ───── Verification ───── */
 #define OP_PURITY_VERIFY     0xFF
+
+#endif /* RCF_OPCODE_H */
+
 
 #endif /* RCF_OPCODE_H */

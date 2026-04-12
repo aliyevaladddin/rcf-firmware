@@ -1,5 +1,20 @@
 .DS_Store
-.vscode
-.idea
-.build
-.cache
+.vscode/
+.idea/
+.build/
+.cache/
+
+# RCF Build Artifacts
+build/
+*.elf
+*.bin
+*.map
+*.o
+*.d
+*.su
+
+# Temporary / OS files
+Thumb.db
+*.tmp
+*.bak
+Makefile

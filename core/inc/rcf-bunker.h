@@ -1,7 +1,7 @@
 /* 
  * [RCF:NOTICE][RCF:RESTRICTED]
- * NOTICE: This file is protected under RCF-PL v1.2.8
- * Bunker Mode: Active Shielding & Entropy Buffering.
+ * NOTICE: This file is protected under RCF-PL v1.3
+ * Bunker Mode: Active Shielding & Entropy Buffering Definitions.
  */
 
 #ifndef RCF_BUNKER_H
@@ -26,5 +26,11 @@ void rcf_bunker_exit(void);
  * @return 32-bit random word.
  */
 uint32_t rcf_bunker_get_entropy(void);
+
+/**
+ * @brief Generates a Dilithium2 keypair inside active Bunker mode.
+ */
+void rcf_bunker_keygen_dilithium2(void);
+
 
 #endif /* RCF_BUNKER_H */

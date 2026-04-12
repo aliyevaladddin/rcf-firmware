@@ -1,25 +1,32 @@
-# NOTICE: This file is protected under RCF-PL v1.2.8
 # [RCF:NOTICE][RCF:RESTRICTED][RCF:PROTECTED]
-# RCF-PL v1.2.8 — Restricted Correlation Framework Public License
+# RCF-PL v1.3 — Restricted Correlation Framework Public License
 
-Copyright (c) 2026 Aladdin Aliyev.
+Copyright (c) 2026 Aladdin Aliyev. All rights reserved.
 
-## 1. PURPOSE
-The Restricted Correlation Framework (RCF) is designed to protect proprietary methodologies, algorithms, and intellectual property from automated extraction, AI/ML training, and unauthorized replication.
+## 1. PREAMBLE
+The Restricted Correlation Framework Public License (RCF-PL) version 1.3 is a "Visible Source" agreement. It is designed to provide architectural transparency for security auditing while ensuring absolute protection of proprietary methodologies, post-quantum logic, and decentralized operating system (dOS) core architectures.
 
-## 2. GRANT OF LICENSE
-Subject to the terms of this License, the Author hereby grants you a limited, non-exclusive, non-transferable license to:
-- Study the designated [RCF:PROTECTED] blocks for security audit and educational purposes.
-- Execute the software in its original, unmodified form.
+## 2. GRANT OF RIGHTS
+The Licensor hereby grants a worldwide, non-exclusive, non-transferable right to:
+- **Audit**: Inspect and analyze [RCF:PROTECTED] blocks for the sole purpose of security verification.
+- **Learn**: Use the architecture as an educational reference.
+- **Deploy**: Execute the firmware on authorized hardware platforms within the Aurora Access ecosystem.
 
-## 3. RESTRICTIONS
+## 3. CORE RESTRICTIONS (THE "RESTRICTED CORRELATION" DOCTRINE)
 You are STRICTLY PROHIBITED from:
-- Utilizing automated tools (scrapers, LLMs, crawlers) to extract logic from [RCF:PROTECTED] or [RCF:RESTRICTED] blocks.
-- Replicating the protected methodology in competing software or decentralized systems without explicit authorization.
-- Removing RCF markers or notices from the source code.
+- **AI/ML Ingestion**: Using any portion of the [RCF:PROTECTED] or [RCF:RESTRICTED] source code for training Large Language Models (LLMs) or similar machine learning systems.
+- **Automated Extraction**: Utilizing crawlers or automated scrapers to reconstruct the logic of the dOS or RCF protocol.
+- **Methodology Replication**: Implementing the core ideas of the Restricted Correlation or Aurora VM in competing or unauthorized systems.
+- **Badge Removal**: Deleting or obscuring RCF markers, copyright notices, or metadata from any part of the source tree.
 
-## 4. ENFORCEMENT
-Violations of this license are subject to enforcement under the jurisdiction specified in the RCF Protocol documentation (https://rcf.aliyev.site).
+## 4. VISIBILITY TIERS
+- **[RCF:PUBLIC]**: Accessible for integration and utility usage.
+- **[RCF:PROTECTED]**: Core logic, visible for audit but strictly non-replicable.
+- **[RCF:RESTRICTED]**: Proprietary methodologies subject to enterprise licensing and HSM-backed verification.
+
+## 5. SOVEREIGNTY & JURISDICTION
+By interacting with this codebase, you acknowledge the digital sovereignty of the Author over the RCF methodology. Enforcement is governed by the protocols defined at https://rcf.aliyev.site.
 
 ---
+*Sovereignty via Restricted Correlation.*
 © 2026 Aladdin Aliyev. All rights reserved.
