@@ -10,6 +10,7 @@
 #define RCF_PROTOCOL_H
 
 #include "rcf_config.h"
+#include "rcf_session.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -28,6 +29,7 @@ typedef enum {
     RCF_ERR_TIMEOUT         = -5,
     RCF_ERR_TAMPER          = -6,   /* Physical security violation */
     RCF_ERR_PILL_OFF        = -7,   /* System zeroized */
+    RCF_ERR_NO_SESSION      = -8,
 } RCF_Error;
 
 /* ─── Version ────────────────────────────────────────────────────────────── */
@@ -77,18 +79,6 @@ typedef struct __attribute__((packed, aligned(32))) {
 
 _Static_assert(sizeof(RCF_Packet_Header) == 64, 
                "RCF_Packet_Header must be exactly 64 bytes for Mil-Spec alignment");
-
-/* ─── Session state ──────────────────────────────────────────────────────── */
-
-typedef struct {
-    uint16_t session_id;
-    uint8_t  enc_key[32];
-    uint8_t  mac_key[32];
-    uint32_t established_time;
-    uint32_t last_activity_time;
-    uint32_t rx_packet_count;
-    uint32_t tx_packet_count;
-} RCF_Session_State;
 
 /* ─── Public API ─────────────────────────────────────────────────────────── */
 
