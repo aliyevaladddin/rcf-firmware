@@ -44,9 +44,9 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 # [RCF v1.3] Hardened RC2 Target — Non-recursive
 RC2: TARGET := rcf-lume-rc2
 RC2: CFLAGS += -DRCF_VM_CI_MODE=1 -DRCF_LIFE_SUPPORT=1
-RC2: export TARGET CFLAGS
 RC2: clean all check-mpk
 	@echo "[RCF] RC2 Hardened Build Complete"
+
 	@arm-none-eabi-size $(BUILD_DIR)/$(TARGET).elf
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
