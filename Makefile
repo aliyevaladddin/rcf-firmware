@@ -44,9 +44,14 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
 # Production build pipeline
+RC2: clean
+	$(MAKE) TARGET=rcf-lume-rc2 all
+	$(MAKE) TARGET=rcf-lume-rc2 check-mpk
+
 RC1: clean
 	$(MAKE) TARGET=rcf-lume-rc1 all
 	$(MAKE) TARGET=rcf-lume-rc1 check-mpk
+
 
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)

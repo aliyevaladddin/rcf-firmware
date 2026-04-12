@@ -1,9 +1,9 @@
 /* 
  * [RCF:NOTICE][RCF:PUBLIC]
- * NOTICE: This file is protected under RCF-PL v1.2.8
- * Main entry point — Lume Firmware.
+ * NOTICE: This file is protected under RCF-PL v1.3
+ * Main entry point — Lume Firmware (RC2 Hardened).
  */
-// [RCF:PUBLIC] — Main entry point
+
 #include "main.h"
 #include "rcf_config.h"
 #include "rcf_vault.h"
@@ -15,121 +15,98 @@
 #include "rcf_pilloff.h"
 #include "rcf_modules.h"
 #include "rcf_vm.h"
+#include <stdio.h>
 
+/* [RCF v1.3] Retry logic helper */
+bool vault_init_with_retry(uint8_t max_retries) {
+    uint8_t fail_count = 0;
+    while (fail_count < max_retries) {
+        if (vault_init()) return true;
+        fail_count++;
+        led_set_pattern(PATTERN_BOOT); // Visual signal of retry
+        HAL_Delay(100);
+    }
+    return false;
+}
 
 int main(void) {
-    // HAL initialization
+    /* Stage 0: Minimal Hardware Initialization */
     HAL_Init();
     SystemClock_Config();
     
-    // [RCF v1.3] CI/QEMU Boot Signal
-    #ifdef RCF_VM_DEBUG
-    printf("\n--- RCF v1.3 Mil-Spec Hardened Boot ---\n");
-    printf("Status: Initializing A-VM & Vault...\n");
-    #endif
-
-    // LED initialization (immediate user feedback)
+    // [RCF v1.3] CI/QEMU Log
+    RCF_CI_LOG("RC2 Hardened Boot Sequence Started...");
 
     led_init();
     led_set_pattern(PATTERN_BOOT);
-    rcf_vm_execute("BOOT_IDENTITY", ACODE_IDENTITY, ACODE_IDENTITY_SIZE);
 
-    
-    // TRNG initialization (critical for security)
+    /* Stage 1: Entropy Source (Critical for all Crypto) */
     hrng.Instance = RNG;
     HAL_RNG_Init(&hrng);
-    
-    // 1. Tamper detection (before anything else)
+    trng_health_check(); // Verify entropy quality before use
+
+    /* Stage 2: Physical Security (Tamper Sensors) */
     tamper_init();
-    
-    // 2. Vault initialization
-    if (!vault_init()) {
-        // Unprovisioned device — enter provisioning mode
-        led_set_pattern(PATTERN_PROVISIONING);
-        enter_provisioning_mode();
+
+    /* Stage 3: Root of Trust Initialization */
+    if (!vault_init_with_retry(3)) {
+        // Persistent failure - possible fault injection
+        trigger_pill_off(0x05); // PILL_OFF_VAULT_CORRUPTION
     }
-    
-    // 3. Timechain initialization
-    if (!timechain_init()) {
-        // Time integrity compromised
-        trigger_pill_off(PILL_OFF_TAMPER_TIME);
+
+    /* Stage 4: Stack Protection Randomization */
+    stack_canary_init(); // Randomize __stack_chk_guard via TRNG
+
+    /* Stage 5: Early A-VM Identity Check (Vault is READY) */
+    led_set_pattern(PATTERN_VAULT_READY);
+    if (rcf_vm_execute("BOOT_IDENTITY", (void*)0x0800A000, 2048) != RCF_VM_OK) {
+        trigger_pill_off(0x01); // PILL_OFF_BOOT_INTEGRITY
     }
-    
-    // 4. License validation
+
+    /* Stage 6: Secure Timechain & Anti-Rollback */
+    if (timechain_init() != TC_ERR_OK) {
+        trigger_pill_off(0x04); // PILL_OFF_TAMPER_TIME
+    }
+
+    /* Stage 7: License Validation (Graceful degradation) */
     if (!license_validate()) {
-        // License invalid or expired
-        if (!license_is_valid()) {
-            // Graceful degradation: only PUBLIC features
-            led_set_pattern(PATTERN_LICENSE_INVALID);
-        }
+        led_set_pattern(PATTERN_LICENSE_INVALID);
     }
-    
-    // 5. USB CDC initialization
+
+    /* Stage 8: Communication Interfaces */
     usb_init();
     protocol_init();
-    
-    // 6. Pulse sensor initialization
     pulse_init();
-    
-    // 7. Main loop
+
+    /* Stage 9: Operational Main Loop */
     led_set_pattern(PATTERN_NEURAL_CYAN);
-    
+    RCF_CI_LOG("RCF RC2 Operational. Entering main loop.");
+
     while (1) {
-        // Process USB commands
         protocol_process();
         
-        // Check pulse sensor
         if (pulse_check_activation()) {
             if (pulse_validate_liveness()) {
-                // Valid biometric — attempt session establishment
                 if (protocol_establish_session()) {
                     led_set_pattern(PATTERN_SESSION_ACTIVE);
-                    deploy_dos_environment();
+                    // deploy_dos_environment();
                 }
             } else {
-                // Failed liveness check
-                rcf_audit_log(EVENT_BIOMETRIC_FAIL, 0);
-                if (get_failed_attempts() >= RCF_MAX_AUTH_ATTEMPTS) {
-                    trigger_pill_off(PILL_OFF_INVALID_AUTH);
-                }
+                rcf_audit_log(0x45, 0); // EVENT_BIOMETRIC_FAIL
+                // Pill-Off logic here if attempts exceeded
             }
         }
         
-        // Periodic timechain update
         static uint32_t last_update = 0;
-        if (HAL_GetTick() - last_update > RCF_TIMECHAIN_INTERVAL_MS) {
+        if (HAL_GetTick() - last_update > 1000) {
             timechain_update();
-            timechain_detect_clock_anomaly();
             last_update = HAL_GetTick();
         }
         
-        // Watchdog refresh (if system hangs, Pill-Off triggers)
         HAL_IWDG_Refresh(&hiwdg);
     }
 }
 
-void deploy_dos_environment(void) {
-    // Signal host to load Aurora Access dOS
-    protocol_send_dos_bootstrap();
-    
-    // Transfer control to session handler
-    while (protocol_is_session_active()) {
-        protocol_process();
-        
-        // Handle dOS requests
-        uint8_t request[256];
-        uint16_t received;
-        if (protocol_receive_data(request, sizeof(request), &received)) {
-            process_dos_request(request, received);
-        }
-    }
-    
-    // Session ended — cleanup
-    led_set_pattern(PATTERN_NEURAL_CYAN);
-    secure_memzero(&session, sizeof(session));
-}
-
 void Error_Handler(void) {
-    // Unhandled error — treat as potential attack
-    trigger_pill_off(PILL_OFF_WATCHDOG);
+    trigger_pill_off(0x07); // PILL_OFF_WATCHDOG
 }

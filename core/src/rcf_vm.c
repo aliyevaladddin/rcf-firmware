@@ -13,7 +13,7 @@
 #include "rcf_bunker.h"
 #include "rcf_pilloff.h"
 #include "rcf_audit.h"
-#include "rcf-config.h"
+#include "rcf_config.h"
 #include "stm32f4xx_hal.h"
 #include <string.h>
 
