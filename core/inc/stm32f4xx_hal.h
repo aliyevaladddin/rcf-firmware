@@ -1,6 +1,7 @@
 /* 
  * [RCF:NOTICE][RCF:PUBLIC]
  * Minimal HAL Stub for CI/QEMU Verification.
+ * NOTICE: This file is protected under RCF-PL v1.3
  */
 
 #ifndef STM32F4XX_HAL_H
@@ -21,6 +22,12 @@ typedef struct {
 void HAL_Init(void);
 void SystemClock_Config(void);
 uint32_t HAL_GetTick(void);
+void HAL_Delay(uint32_t Delay);
+
+/* Unique ID Access */
+static inline uint32_t HAL_GetUIDw0(void) { return 0x12345678; }
+static inline uint32_t HAL_GetUIDw1(void) { return 0xABCDEF01; }
+static inline uint32_t HAL_GetUIDw2(void) { return 0xBADC0FFE; }
 
 /* RNG */
 void HAL_RNG_Init(RNG_HandleTypeDef* hrng);
