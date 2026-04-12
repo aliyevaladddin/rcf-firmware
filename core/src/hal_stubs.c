@@ -6,6 +6,7 @@
 #include "stm32f4xx_hal.h"
 #include "rcf_led.h"
 #include <stdio.h>
+#include <unistd.h>  /* For usleep in CI mode */
 
 /* Global instances used in main.c */
 RNG_HandleTypeDef hrng;
@@ -22,7 +23,7 @@ void trng_health_check(void) {
     if (trng_test[0] == trng_test[1] || trng_test[0] == 0 || trng_test[0] == 0xFFFFFFFF) {
         // [RCF:CRITICAL] TRNG Fault detected
         extern void trigger_pill_off(uint8_t reason);
-        trigger_pill_off(0x06); // PILL_OFF_TRNG_FAULT
+        trigger_pill_off(0x14); // PILL_OFF_TRNG_FAULT
     }
 }
 
@@ -38,11 +39,10 @@ void stack_canary_init(void) {
 /* [RCF:CRITICAL] GCC Stack protection failure handler */
 void __stack_chk_fail(void) {
     extern void trigger_pill_off(uint8_t reason);
-    trigger_pill_off(0x02); // PILL_OFF_STACK_TAMPER
+    trigger_pill_off(0x12); // PILL_OFF_TAMPER_CODE
 }
 
 void HAL_Init(void) {
-
     // Stub
 }
 
@@ -56,7 +56,9 @@ uint32_t HAL_GetTick(void) {
 }
 
 void HAL_Delay(uint32_t Delay) {
-    // Stub
+#ifdef RCF_VM_CI_MODE
+    usleep(Delay * 1000); // 1ms = 1000us
+#endif
 }
 
 void HAL_RNG_Init(RNG_HandleTypeDef* hrng) {

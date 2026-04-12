@@ -5,6 +5,7 @@
  */
 
 #include "main.h"
+#include "stm32f4xx_hal.h"
 #include "rcf_config.h"
 #include "rcf_vault.h"
 #include "rcf_timechain.h"
@@ -61,12 +62,12 @@ int main(void) {
     /* Stage 5: Early A-VM Identity Check (Vault is READY) */
     led_set_pattern(LED_PATTERN_SUCCESS);
     if (rcf_vm_execute("BOOT_IDENTITY", (void*)0x0800A000, 2048) != VM_OK) {
-        trigger_pill_off(PILL_OFF_ACODE); // PILL_OFF_BOOT_INTEGRITY
+        trigger_pill_off(PILL_OFF_ACODE); 
     }
 
     /* Stage 6: Secure Timechain & Anti-Rollback */
     if (timechain_init() != TC_ERR_OK) {
-        trigger_pill_off(PILL_OFF_TAMPER); // PILL_OFF_TAMPER_TIME
+        trigger_pill_off(PILL_OFF_TAMPER_TIME); 
     }
 
     /* Stage 7: License Validation (Graceful degradation) */
@@ -90,7 +91,6 @@ int main(void) {
             if (pulse_validate_liveness()) {
                 if (protocol_establish_session() == RCF_OK) {
                     led_set_pattern(LED_PATTERN_SUCCESS);
-                    // deploy_dos_environment();
                 }
             } else {
                 rcf_audit_log(EVENT_BIOMETRIC_FAIL, 0); 
@@ -109,5 +109,5 @@ int main(void) {
 }
 
 void Error_Handler(void) {
-    trigger_pill_off(0x07); // PILL_OFF_WATCHDOG
+    trigger_pill_off(PILL_OFF_WATCHDOG);
 }
