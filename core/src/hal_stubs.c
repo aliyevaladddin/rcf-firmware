@@ -7,10 +7,12 @@
 #include "rcf_led.h"
 #include <stdio.h>
 #include <unistd.h>  /* For usleep in CI mode */
+#include <string.h>
 
-/* Global instances used in main.c */
+/* Global instances used in main.c and modules */
 RNG_HandleTypeDef hrng;
 IWDG_HandleTypeDef hiwdg;
+RTC_HandleTypeDef hrtc;
 uint32_t __stack_chk_guard = 0xDEADBEEF;
 
 /* [RCF v1.3] TRNG Health Check — Protect against hardware fault attacks */
@@ -61,18 +63,40 @@ void HAL_Delay(uint32_t Delay) {
 #endif
 }
 
-void HAL_RNG_Init(RNG_HandleTypeDef* hrng) {
-    // Stub
+void HAL_RNG_Init(RNG_HandleTypeDef* phrng) {
+    phrng->Instance = RNG;
 }
 
-void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* hrng, uint32_t* random32) {
-    *random32 = 0x12345678; // Mock random
+void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* phrng, uint32_t* random32) {
+    static uint32_t seed = 0x12345678;
+    seed = seed * 1103515245 + 12345;
+    *random32 = seed;
 }
 
-void __HAL_RNG_ENABLE(RNG_HandleTypeDef* hrng) { (void)hrng; }
-void __HAL_RNG_DISABLE(RNG_HandleTypeDef* hrng) { (void)hrng; }
+void __HAL_RNG_ENABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
+void __HAL_RNG_DISABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
 
 void HAL_IWDG_Refresh(IWDG_HandleTypeDef* hiwdg) { (void)hiwdg; }
+
+/* RTC Stubs */
+void HAL_RTC_GetTime(RTC_HandleTypeDef* phrtc, RTC_TimeTypeDef* sTime, uint32_t Format) {
+    (void)phrtc; (void)Format;
+    sTime->Hours = 12; sTime->Minutes = 0; sTime->Seconds = 0;
+}
+
+void HAL_RTC_GetDate(RTC_HandleTypeDef* phrtc, RTC_DateTypeDef* sDate, uint32_t Format) {
+    (void)phrtc; (void)Format;
+    sDate->Year = 26; sDate->Month = 4; sDate->Date = 12;
+}
+
+/* Timechain Helpers */
+uint64_t rtc_to_unix(RTC_TimeTypeDef sTime, RTC_DateTypeDef sDate) {
+    (void)sTime; (void)sDate;
+    return 1712923200; // Fixed mock timestamp: 2026-04-12 12:00:00
+}
+
+int16_t get_internal_temperature(void) { return 25; }
+uint16_t get_vbat_voltage(void) { return 3300; }
 
 /* Mocking missing module functions to satisfy linker */
 void led_init(void) {}

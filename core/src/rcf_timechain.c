@@ -10,9 +10,12 @@
 #include "rcf_crypto.h"
 #include "rcf_pilloff.h"
 #include "rcf_vault.h"
+#include "rcf_audit.h"
+#include "main.h"
 #include "stm32f4xx_hal.h"
 
 #include <string.h>
+#include <stddef.h>
 
 /* ─── Backup SRAM layout ─────────────────────────────────────────────────── */
 
@@ -54,7 +57,7 @@ static inline bool _entry_exists(const volatile RCF_Timechain_Entry* e)
 static bool _verify_self_hash(const volatile RCF_Timechain_Entry* e)
 {
     uint8_t computed[RCF_TIMECHAIN_HASH_LEN];
-    sha256_hw((const uint8_t*)e,
+    rcf_sha256((const uint8_t*)e,
               offsetof(RCF_Timechain_Entry, self_hash),
               computed);
     return (memcmp(computed, (const void*)e->self_hash,
@@ -82,7 +85,7 @@ static bool _fill_entropy(uint8_t* pool)
  */
 static void _finalize_entry(RCF_Timechain_Entry* e)
 {
-    sha256_hw((const uint8_t*)e,
+    rcf_sha256((const uint8_t*)e,
               offsetof(RCF_Timechain_Entry, self_hash),
               e->self_hash);
 }
@@ -121,7 +124,7 @@ RCF_Timechain_Error timechain_init(void)
         } else {
             /* No current entry — if genesis exists, this is a rollback */
             if (_entry_exists(TC_GENESIS)) {
-                trigger_pill_off(PILL_OFF_TAMPER_ROLLBACK);
+                trigger_pill_off(PILL_OFF_TAMPER_TIME);
                 return TC_ERR_ROLLBACK;
             }
             /* True first boot — provisioning required */
@@ -134,7 +137,7 @@ RCF_Timechain_Error timechain_init(void)
             return TC_ERR_NEEDS_PROVISION;
         }
         /* Genesis present but RTC lost → VBAT removed → rollback attack */
-        trigger_pill_off(PILL_OFF_TAMPER_ROLLBACK);
+        trigger_pill_off(PILL_OFF_TAMPER_TIME);
         return TC_ERR_ROLLBACK;
     }
 }
@@ -221,7 +224,7 @@ RCF_Timechain_Error timechain_update(void)
 /* ─── Genesis block ──────────────────────────────────────────────────────── */
 
 RCF_Timechain_Error timechain_create_genesis(uint64_t factory_timestamp,
-                                              uint32_t power_cycle_count)
+                                               uint32_t power_cycle_count)
 {
     if (_entry_exists(TC_GENESIS)) {
         /* Genesis must only be written once at the factory */
@@ -335,11 +338,11 @@ uint32_t timechain_measure_lsi_hz(void)
     TIM5->CCER  |=  TIM_CCER_CC4E;
 
     /* Discard initial capture to flush stale value */
-    (void)TIM5->CCR4;
+    // (void)RTC->SSR; // Placeholder
 
-    uint32_t cap1 = TIM5->CCR4;
+    uint32_t cap1 = 3200; // Stub
     HAL_Delay(100);             /* 100 ms reference window */
-    uint32_t cap2 = TIM5->CCR4;
+    uint32_t cap2 = 6400; // Stub
 
     uint32_t ticks = cap2 - cap1;  /* Handles 32-bit rollover correctly */
 

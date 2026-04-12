@@ -9,6 +9,9 @@
 #include "rcf_crypto.h"
 #include "rcf_vault.h"
 #include "rcf_vm.h"
+#include "rcf_pilloff.h"
+#include "rcf_audit.h"
+#include "main.h"
 #include <string.h>
 
 /* ─── Internal helpers ───────────────────────────────────────────────────── */
@@ -53,14 +56,13 @@ static void _process_command(RCF_Packet_Header* header, uint8_t* payload) {
             break;
 
         case RCF_CMD_PILL_OFF:
-            /* Emergency shutdown — logic in rcf_pilloff.h */
-            extern void trigger_pill_off(uint8_t reason);
-            trigger_pill_off(0xFF); // PILL_OFF_IMMEDIATE
+            trigger_pill_off(PILL_OFF_IMMEDIATE);
             break;
 
         default:
             break;
     }
+    (void)payload;
 }
 
 void protocol_process(void) {
@@ -70,10 +72,16 @@ void protocol_process(void) {
     }
 
     RCF_Packet_Header header;
-    /* [STUB] usb_receive mock */
-    // if (!usb_receive((uint8_t*)&header, sizeof(header))) return;
-    
-    // Process logic here...
+    /* In CI mode, we mock the reception */
+    #ifdef RCF_VM_CI_MODE
+    memset(&header, 0, sizeof(header));
+    #else
+    // Actual USB receive logic here
+    #endif
+
+    if (_validate_magic(header.magic)) {
+        _process_command(&header, NULL);
+    }
 }
 
 /* ─── Data transmission ──────────────────────────────────────────────────── */
@@ -114,5 +122,6 @@ RCF_Error protocol_receive_data(uint8_t* out_buf, uint16_t max_len,
     if (!session_is_active()) return RCF_ERR_NO_SESSION;
 
     /* [RCF v1.3] Receive and decrypt session-bound data */
+    (void)out_buf; (void)max_len; (void)out_received; (void)out_marker;
     return RCF_OK; // Stub
 }
