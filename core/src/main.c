@@ -114,7 +114,6 @@ int main(void) {
                 }
             } else {
                 rcf_audit_log(EVENT_BIOMETRIC_FAIL, 0); 
-                // Pill-Off logic here if attempts exceeded
             }
         }
         
@@ -124,9 +123,11 @@ int main(void) {
             last_update = HAL_GetTick();
         }
         
-        HAL_IWDG_Refresh(&hiwdg);
+        HAL_Delay(10);
+#endif
     }
 }
+
 
 void Error_Handler(void) {
     trigger_pill_off(PILL_OFF_WATCHDOG);
