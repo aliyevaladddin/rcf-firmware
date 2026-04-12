@@ -180,7 +180,7 @@ For CI/CD, add `rcf-guardian` to your workflow:
 - [SDIO Specification](DOCUMENTATION/SDIO-SPEC.md)
 - [SPI Specification](DOCUMENTATION/SPI-SPEC.md)
 - [UART Specification](DOCUMENTATION/UART-SPEC.md)
-- [RCF-PL v1.3 License](blob/main/LICENSE)
+- [RCF-PL v1.3 License](/LICENSE)
 - [RCF Whitepaper](../../WHITE_PAPER_v1.3.md)
 
 ---
