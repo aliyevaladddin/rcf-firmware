@@ -136,3 +136,17 @@ bool vault_integrity_check(void) {
     /* [RCF v1.3] SHA-256 integrity check of Vault configuration */
     return true;
 }
+
+bool vault_load_key(Vault_KeyType type, uint8_t* out_buffer, uint32_t* out_len) {
+    (void)type;
+#ifdef RCF_VM_CI_MODE
+    /* CI: return dummy key */
+    memset(out_buffer, 0xAA, 32);
+    *out_len = 32;
+    return true;
+#else
+    /* Production: Load from secure storage (OTP/CCMRAM) */
+    /* TODO: Hardware-specific implementation */
+    return false;
+#endif
+}

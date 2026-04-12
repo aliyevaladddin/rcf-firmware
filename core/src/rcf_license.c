@@ -75,11 +75,11 @@ bool license_is_valid(void) {
 
 static void compute_code_fingerprint(uint8_t* out_hash) {
     /* [RCF v1.3] Hash .text and .rodata segments */
-    extern uint32_t _stext, _etext;
-    uint32_t text_len = (uint32_t)&_etext - (uint32_t)&_stext;
+    extern uint32_t _etext;
+    uint32_t text_len = (uint32_t)&_etext - 0x08000000;
 
     
-    rcf_sha256((uint8_t*)&_stext, text_len, out_hash);
+    rcf_sha256((uint8_t*)0x08000000, text_len, out_hash);
 }
 
 bool license_check_feature(uint8_t feature_flag) {

@@ -6,6 +6,7 @@
 
 #include "rcf_crypto.h"
 #include "rcf_config.h"
+#include <string.h>
 
 #ifdef RCF_VM_CI_MODE
 /* CI stubs — no real crypto, just pass-through for testing */
@@ -26,6 +27,14 @@ void rcf_sha256(const uint8_t* data, uint32_t len, uint8_t* hash_out) {
     (void)data; (void)len;
 }
 
+void rcf_aes256_gcm_encrypt(const uint8_t* key, const uint8_t* iv,
+                            const uint8_t* plaintext, uint32_t len,
+                            uint8_t* ciphertext, uint8_t* tag) {
+    (void)key; (void)iv; (void)tag;
+    /* CI: plaintext pass-through */
+    memcpy(ciphertext, plaintext, len);
+}
+
 bool rcf_aes256_gcm_decrypt(const uint8_t* key, const uint8_t* iv,
                             const uint8_t* ciphertext, uint32_t len,
                             const uint8_t* tag, uint8_t* plaintext) {
@@ -39,6 +48,22 @@ void rcf_hmac_sha256(const uint8_t* key, uint32_t key_len,
                      uint8_t* mac_out) {
     (void)key; (void)key_len; (void)data; (void)data_len;
     for (int i = 0; i < 32; i++) mac_out[i] = i;
+}
+
+void rcf_curve25519_keygen(uint8_t* pk, uint8_t* sk) {
+    /* CI: deterministic mock keys */
+    for(int i = 0; i < 32; i++) {
+        pk[i] = (uint8_t)(i * 7 + 3);
+        sk[i] = (uint8_t)(i * 5 + 11);
+    }
+}
+
+void rcf_curve25519_shared(const uint8_t* sk, const uint8_t* pk, uint8_t* shared) {
+    (void)sk; (void)pk;
+    /* CI: mock shared secret */
+    for(int i = 0; i < 32; i++) {
+        shared[i] = 0xAB;
+    }
 }
 
 #else

@@ -6,7 +6,6 @@
 #include "stm32f4xx_hal.h"
 #include "rcf_led.h"
 #include <stdio.h>
-#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -50,17 +49,17 @@ uint32_t HAL_GetTick(void) {
     return tick++;
 }
 
-void HAL_Delay(uint32_t Delay) {
-#ifdef RCF_VM_CI_MODE
-    usleep(Delay * 1000);
-#endif
+/* [FIX] Busy-wait implementation for bare-metal CI */
+void HAL_Delay(uint32_t ms) {
+    for (volatile uint32_t i = 0; i < ms * 8000U; i++) {
+        __asm__ volatile ("nop");
+    }
 }
 
 void HAL_RNG_Init(RNG_HandleTypeDef* phrng) {
-    phrng->Instance = RNG;
+    phrng->Instance = (void*)RNG;
 }
 
-/* [FIX] Return HAL_StatusTypeDef to satisfy timechain.c */
 HAL_StatusTypeDef HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* phrng, uint32_t* random32) {
     (void)phrng;
     *random32 = (uint32_t)rand();
@@ -94,17 +93,9 @@ uint32_t get_vbat_voltage(void) {
     return 3300; /* 3.3V */
 }
 
-/* ───────────────────────────────────────────────────────────────────────── */
+/* ─── IRQ Handlers ──────────────────────────────────────────────────────── */
 
-void led_init(void) {}
-void led_set_pattern(LED_Pattern p) { (void)p; }
-void led_set_void_black(void) {}
-void tamper_init(void) {}
-void usb_init(void) {}
-void pulse_init(void) {}
-bool pulse_check_activation(void) { return false; }
-bool pulse_validate_liveness(void) { return false; }
-uint8_t get_failed_attempts(void) { return 0; }
-void enter_provisioning_mode(void) {}
-void process_dos_request(uint8_t* r, uint16_t l) { (void)r; (void)l; }
-void protocol_send_dos_bootstrap(void) {}
+void WWDG_IRQHandler(void) {}
+void PVD_IRQHandler(void) {}
+void TAMP_STAMP_IRQHandler(void) {}
+void RTC_WKUP_IRQHandler(void) {}
