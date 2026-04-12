@@ -1,83 +1,103 @@
-# RCF Firmware — Aurora Access
+# RCF-Firmware
 
-> **Root-of-Trust for the dOS Ecosystem**
+> **Root-of-Trust for the dOS Ecosystem · Aurora Access · STM32F407**
 
-[![RCF Protected](https://img.shields.io/badge/license-RCF--PL%20v1.3-7F77DD?style=flat-square)](../../LICENSE)
-[![Status](https://img.shields.io/badge/status-active-1D9E75?style=flat-square)]()
-# RCF-Firmware: LUME (v1.3 RC2-LS)
-
-[![Build Status](https://github.com/aladdinaliyev/rcf-firmware/actions/workflows/main.yml/badge.svg)](https://github.com/aladdinaliyev/rcf-firmware/actions)
-[![License: RCF-PL v1.3](https://img.shields.io/badge/License-RCF--PL%20v1.3-blue.svg)](LICENSE)
-
-**LUME** — это hardened-прошивка стандарта **Restricted Correlation Framework**, разработанная для узлов **Aurora Access**. Версия v1.3 RC2-LS (Life Support) спроектирована для работы на STM32F407 в режиме максимальной изоляции и защиты от взлома.
-
-## 🚀 Текущий статус: RC2-LS
-- **Core:** Bare-metal STM32F4 implementation.
-- **Security:** Hardware-backed Vault, Timechain Anti-Rollback, A-VM Bytecode Interpreter.
-- **Verification:** 100% Green on QEMU CI tests.
-
-## 📚 Документация
-- **[RCF-SPEC](DOCUMENTATION/RCF-SPECIFICATION.md)** — Мастер-спецификация протокола v1.3.
-- **[Hardware Protocol](DOCUMENTATION/HARDWARE-PROTOCOL.md)** — Спецификация обмена данными Host <-> Device.
-- **[A-VM Opcodes](DOCUMENTATION/AURORA-VM-OPCODES.md)** — Справочник команд виртуальной машины Aurora.
-- **[Security Model](DOCUMENTATION/SECURITY-MODEL.md)** — Подробное описание уровней защиты.
-
-## 🛠 Сборка
-```bash
-make clean
-make RC2
-```
-Генерирует `.build/rcf-lume-rc2.bin` для прошивки.
+[![Build](https://github.com/aliyevaladddin/rcf-firmware/actions/workflows/rc2-hardened.yml/badge.svg)](https://github.com/aliyevaladddin/rcf-firmware/action)
+[![License: RCF-PL v1.3](https://img.shields.io/badge/license-RCF--PL%20v1.3-7F77DD?style=flat-square)](LICENSE)
+[![Status](https://img.shields.io/badge/status-RC2--LS-1D9E75?style=flat-square)]()
+[![Target](https://img.shields.io/badge/target-STM32F407-534AB7?style=flat-square)]()
+[![QEMU CI](https://img.shields.io/badge/QEMU%20CI-passing-1D9E75?style=flat-square)]()
 
 ---
 
-## Key Features
+**RCF-Firmware** is a hardened firmware implementation of the **Restricted Correlation Framework**, designed for **Aurora Access** nodes. Version RC2-LS (Life Support) delivers a full bare-metal security stack on the STM32F407: from hardware Root-of-Trust to verified bytecode execution.
+
+This project is governed by **RCF-PL v1.3** — Visible Source, Protected Logic. The architecture is open for audit. The methodology is protected.
+
+---
+
+## RC2-LS Status
+
+| Component | Status |
+|---|---|
+| A-VM (Aurora Virtual Machine) | ✅ Active |
+| Timechain Anti-Rollback | ✅ Active |
+| RCF Bunker (Crypto Isolation) | ✅ Active |
+| Factory Provisioning | ✅ Active |
+| QEMU CI Verification | ✅ 100% Green |
+| PQC Dilithium2 | ✅ Integrated |
+
+---
+
+## Key Components
 
 | Component | Description |
 |---|---|
-| **A-VM** | Aurora Virtual Machine — secure execution engine for signed `.acode` modules |
-| **PQC Security** | Post-Quantum verification via **Dilithium2** (NIST PQC standard) |
-| **Embedded Modules** | Filesystem-independent boot modules (Heartbeat, Identity) as static C arrays |
-| **RCF Hardware Protocol v1.2.9** | Standardized peripheral abstraction (Flash, SD/MMC, SPI, UART) |
-| **RCF Bunker** | Isolated shielding mode for cryptographic key operations |
-| **Factory Provisioning** | Per-device identity and license injection at manufacture time |
+| **A-VM** | Aurora Virtual Machine — executes only cryptographically signed `.acode` modules |
+| **PQC Security** | Post-Quantum verification via **Dilithium2** (NIST PQC Level 2) |
+| **RCF Bunker** | Isolated execution mode for cryptographic key operations |
+| **Timechain** | SHA-256 linked chain in Backup SRAM — rollback and physical tamper protection |
+| **Hardware Protocol v1.2.9** | Unified peripheral abstraction: Flash, SD/MMC, SPI, UART |
+| **Factory Provisioning** | Unique cryptographic device identity injected at manufacture time |
 
 ---
 
 ## Project Structure
 
 ```
-AuroraAccess/
-├── core/
-│   ├── src/          — Proprietary firmware logic      [RCF:PROTECTED]
-│   └── inc/          — Hardware & protocol headers     [RCF:PUBLIC]
-├── modules/          — Binary .acode source modules    [RCF:RESTRICTED]
-├── DOCUMENTATION/
-│   ├── HARDWARE-PROTOCOL.md   — RCF Hardware Protocol spec
-│   ├── SDIO-SPEC.md           — SDIO/SD-MMC specification
-│   ├── SPI-SPEC.md            — SPI bus specification
-│   └── UART-SPEC.md           — UART specification
+rcf-firmware/
+├── AuroraAccess/
+│   ├── core/
+│   │   ├── src/              [RCF:PROTECTED]  — Firmware logic
+│   │   └── inc/              [RCF:PUBLIC]     — Headers and protocol definitions
+│   ├── modules/              [RCF:RESTRICTED] — Binary .acode modules
+│   └── DOCUMENTATION/
+│       ├── RCF-SPECIFICATION.md  — Master protocol specification
+│       ├── HARDWARE-PROTOCOL.md  — Host to Device data exchange
+│       ├── AURORA-VM-OPCODES.md  — A-VM opcode reference
+│       ├── SECURITY-MODEL.md     — Protection levels and threat model
+│       ├── SDIO-SPEC.md
+│       ├── SPI-SPEC.md
+│       └── UART-SPEC.md
+├── tools/
+│   └── rcf-provision.py     [RCF:RESTRICTED] — Factory provisioning tool
+├── tests/
+│   └── qemu_verify.py        — QEMU CI verification
 └── build/
-    └── Makefile      — Build system (STM32F407 reference)
-
-tools/
-└── rcf-provision.py  — Factory provisioning tool       [RCF:RESTRICTED]
+    └── Makefile              — STM32F407 build system
 ```
 
 ---
 
-## Provisioning
+## Build
 
-Each device receives a unique cryptographic identity at manufacturing time via `rcf-provision.py`.
+```bash
+# RC2 production build
+make clean && make RC2
+# Output: .build/rcf-lume-rc2.bin
 
-### Prerequisites
+# Debug build
+make DEBUG=1
+
+# QEMU CI verification
+python3 tests/qemu_verify.py .build/rcf-lume-rc2.elf
+# [RCF-TEST] CI Verification PASSED.
+```
+
+---
+
+## Factory Provisioning
+
+Every device receives a unique cryptographic identity at manufacturing time via `rcf-provision.py`.
+
+**Prerequisites:**
 
 ```bash
 pip install cryptography
-export RCF_SIGNER_PATH=./bin/rcf-signer   # path to PQC signer binary
+export RCF_SIGNER_PATH=./bin/rcf-signer
 ```
 
-### Usage
+**Usage:**
 
 ```bash
 # Full provisioning + PQC signing
@@ -87,20 +107,20 @@ python tools/rcf-provision.py \
   --uid    DEVICE-ARM64-001 \
   --manifest
 
-# Preview without writing (dry-run)
+# Preview without writing
 python tools/rcf-provision.py \
   --device build/aurora.bin \
   --output build/aurora.provisioned.bin \
   --dry-run
 
-# Provision without signing (testing)
+# Provision without signing (testing only)
 python tools/rcf-provision.py \
   --device build/aurora.bin \
   --output build/aurora.provisioned.bin \
   --no-sign
 ```
 
-### Output
+**Output:**
 
 ```
 [RCF] Loaded binary: build/aurora.bin (131,072 bytes)
@@ -117,40 +137,17 @@ python tools/rcf-provision.py \
 
 ---
 
-## Build Firmware
-
-```bash
-cd AuroraAccess/build
-make
-
-# Clean build
-make clean && make
-
-# With debug symbols
-make DEBUG=1
-```
-
----
-
 ## Compliance & Audit
 
-This project enforces **100% RCF compliance** using `rcf-cli`.
-
 ```bash
-# Install rcf-cli
 pip install rcf-cli
 
-# Check compliance
-rcf-cli protect AuroraAccess/ --dry-run
-
-# Generate audit report
-rcf-cli audit AuroraAccess/ --license-key $RCF_LICENSE_KEY
-
-# Verify integrity (CI/CD)
-rcf-cli diff AuroraAccess/
+rcf-cli protect AuroraAccess/ --dry-run            # preview marker insertion
+rcf-cli audit   AuroraAccess/ --license-key $RCF_LICENSE_KEY
+rcf-cli diff    AuroraAccess/                      # CI integrity check
 ```
 
-For CI/CD, add `rcf-guardian` to your workflow:
+**GitHub Action (rcf-guardian):**
 
 ```yaml
 - uses: aliyev/rcf-guardian@v1
@@ -164,41 +161,51 @@ For CI/CD, add `rcf-guardian` to your workflow:
 ## Security Model
 
 ```
-┌─────────────────────────────────────┐
-│           Hardware Node             │
-│  ┌───────────────────────────────┐  │
-│  │         RCF Bunker            │  │  ← Isolated crypto zone
-│  │   (Dilithium2 / X25519 keys)  │  │
-│  └───────────┬───────────────────┘  │
-│              │                      │
-│  ┌───────────▼───────────────────┐  │
-│  │      A-VM (Aurora VM)         │  │  ← Only signed .acode runs
-│  │   [RCF:RESTRICTED] core       │  │
-│  └───────────┬───────────────────┘  │
-│              │                      │
-│  ┌───────────▼───────────────────┐  │
-│  │   RCF Hardware Protocol       │  │  ← Unified peripheral access
-│  │   SD / Flash / SPI / UART     │  │
-│  └───────────────────────────────┘  │
-└─────────────────────────────────────┘
-         ▲
-         │ Factory Provisioning
-   rcf-provision.py
-   (Vault + Genesis + License)
+┌──────────────────────────────────────────┐
+│              Hardware Node               │
+│  ┌────────────────────────────────────┐  │
+│  │           RCF Bunker               │  │  <- Isolated crypto zone
+│  │   Dilithium2 / X25519 / AES-GCM    │  │     Keys never leave this context
+│  └──────────────┬─────────────────────┘  │
+│                 │                        │
+│  ┌──────────────▼─────────────────────┐  │
+│  │       A-VM (Aurora VM)             │  │  <- Only signed .acode executes
+│  │       [RCF:RESTRICTED]             │  │     Dilithium2 verified
+│  └──────────────┬─────────────────────┘  │
+│                 │                        │
+│  ┌──────────────▼─────────────────────┐  │
+│  │      RCF Hardware Protocol         │  │  <- SD / Flash / SPI / UART
+│  │             v1.2.9                 │  │     Unified peripheral access
+│  └────────────────────────────────────┘  │
+│                 ▲                        │
+│  ┌──────────────┴─────────────────────┐  │
+│  │     Timechain (Backup SRAM)        │  │  <- Anti-rollback
+│  │     SHA-256 chain · VBAT-backed    │  │     Physical tamper detection
+│  └────────────────────────────────────┘  │
+└──────────────────────────────────────────┘
+              ▲
+              │ Factory Provisioning
+        rcf-provision.py
+        Vault + Genesis + License
 ```
 
 ---
 
 ## Documentation
 
-- [RCF Hardware Protocol](DOCUMENTATION/HARDWARE-PROTOCOL.md)
-- [SDIO Specification](DOCUMENTATION/SDIO-SPEC.md)
-- [SPI Specification](DOCUMENTATION/SPI-SPEC.md)
-- [UART Specification](DOCUMENTATION/UART-SPEC.md)
-- [RCF-PL v1.3 License](/LICENSE)
-- [RCF Whitepaper](../../WHITE_PAPER_v1.3.md)
+| Document | Description |
+|---|---|
+| [RCF-SPECIFICATION.md](DOCUMENTATION/RCF-SPECIFICATION.md) | Master protocol specification v1.3 |
+| [HARDWARE-PROTOCOL.md](DOCUMENTATION/HARDWARE-PROTOCOL.md) | Host to Device data exchange |
+| [AURORA-VM-OPCODES.md](DOCUMENTATION/AURORA-VM-OPCODES.md) | A-VM opcode reference |
+| [SECURITY-MODEL.md](DOCUMENTATION/SECURITY-MODEL.md) | Protection levels and threat model |
+| [SDIO-SPEC.md](DOCUMENTATION/SDIO-SPEC.md) | SDIO / SD-MMC specification |
+| [SPI-SPEC.md](DOCUMENTATION/SPI-SPEC.md) | SPI bus specification |
+| [UART-SPEC.md](DOCUMENTATION/UART-SPEC.md) | UART specification |
+| [RCF-PL v1.3 License](LICENSE) | Full license text |
+| [RCF Whitepaper](../../WHITE_PAPER_v1.3.md) | Technical and legal rationale |
 
 ---
 
-*© 2026 Aladdin Aliyev. All rights reserved.*  
+*© 2026 Aladdin Aliyev. All rights reserved.*
 *Protected under RCF-PL v1.3 — Sovereignty via Restricted Correlation.*
