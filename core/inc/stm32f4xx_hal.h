@@ -19,10 +19,39 @@
 #define RTC_FORMAT_BIN  0x00000000U
 
 /* Forward declarations */
-typedef struct { void* Instance; } RTC_TypeDef;
 typedef struct { 
-    uint32_t CCER;
-    uint32_t CCMR2;
+    uint32_t TR;
+    uint32_t DR;
+    uint32_t CR;
+    uint32_t ISR;
+    uint32_t PRER;
+    uint32_t WUTR;
+    uint32_t CALIBR;
+    uint32_t ALRMAR;
+    uint32_t ALRMBR;
+    uint32_t WPR;
+    uint32_t SSR;     /* Subsecond register used in timechain */
+    uint32_t SHIFTR;
+} RTC_TypeDef;
+
+typedef struct { 
+    uint32_t CR1;
+    uint32_t CR2;
+    uint32_t SMCR;
+    uint32_t DIER;
+    uint32_t SR;
+    uint32_t EGR;
+    uint32_t CCMR1;
+    uint32_t CCMR2;   /* Used in timechain */
+    uint32_t CCER;    /* Used in timechain */
+    uint32_t CNT;
+    uint32_t PSC;
+    uint32_t ARR;
+    uint32_t RCR;
+    uint32_t CCR1;
+    uint32_t CCR2;
+    uint32_t CCR3;
+    uint32_t CCR4;    /* Capture/Compare register used in timechain */
 } TIM_TypeDef;
 
 #define TIM_CCER_CC4E       (1U << 12)
@@ -33,7 +62,7 @@ typedef struct {
 } RNG_HandleTypeDef;
 
 typedef struct {
-    void* Instance;
+    RTC_TypeDef* Instance;
 } RTC_HandleTypeDef;
 
 typedef struct {
@@ -61,18 +90,18 @@ static inline uint32_t HAL_GetUIDw1(void) { return 0xABCDEF01; }
 static inline uint32_t HAL_GetUIDw2(void) { return 0xBADC0FFE; }
 
 /* RNG */
-void HAL_RNG_Init(RNG_HandleTypeDef* hrng);
-void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* hrng, uint32_t* random32);
-void __HAL_RNG_ENABLE(RNG_HandleTypeDef* hrng);
-void __HAL_RNG_DISABLE(RNG_HandleTypeDef* hrng);
+void HAL_RNG_Init(RNG_HandleTypeDef* phrng);
+void HAL_RNG_GenerateRandomNumber(RNG_HandleTypeDef* phrng, uint32_t* random32);
+void __HAL_RNG_ENABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
+void __HAL_RNG_DISABLE(RNG_HandleTypeDef* phrng) { (void)phrng; }
 
 /* IWDG */
 typedef struct { void* Instance; } IWDG_HandleTypeDef;
 void HAL_IWDG_Refresh(IWDG_HandleTypeDef* hiwdg);
 
 /* RTC */
-void HAL_RTC_GetTime(RTC_HandleTypeDef* hrtc, RTC_TimeTypeDef* sTime, uint32_t Format);
-void HAL_RTC_GetDate(RTC_HandleTypeDef* hrtc, RTC_DateTypeDef* sDate, uint32_t Format);
+void HAL_RTC_GetTime(RTC_HandleTypeDef* phrtc, RTC_TimeTypeDef* sTime, uint32_t Format);
+void HAL_RTC_GetDate(RTC_HandleTypeDef* phrtc, RTC_DateTypeDef* sDate, uint32_t Format);
 
 /* Clock macros (CI stubs) */
 #define __HAL_RCC_BKPSRAM_CLK_ENABLE()  ((void)0)
