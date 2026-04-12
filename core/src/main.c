@@ -15,6 +15,7 @@
 #include "rcf_pilloff.h"
 #include "rcf_modules.h"
 #include "rcf_vm.h"
+#include "rcf_audit.h"
 #include <stdio.h>
 
 /* [RCF v1.3] Retry logic helper */
@@ -23,7 +24,7 @@ bool vault_init_with_retry(uint8_t max_retries) {
     while (fail_count < max_retries) {
         if (vault_init()) return true;
         fail_count++;
-        led_set_pattern(PATTERN_BOOT); // Visual signal of retry
+        led_set_pattern(LED_PATTERN_BOOTING); // Visual signal of retry
         HAL_Delay(100);
     }
     return false;
@@ -38,7 +39,7 @@ int main(void) {
     RCF_CI_LOG("RC2 Hardened Boot Sequence Started...");
 
     led_init();
-    led_set_pattern(PATTERN_BOOT);
+    led_set_pattern(LED_PATTERN_BOOTING);
 
     /* Stage 1: Entropy Source (Critical for all Crypto) */
     hrng.Instance = RNG;
@@ -51,26 +52,26 @@ int main(void) {
     /* Stage 3: Root of Trust Initialization */
     if (!vault_init_with_retry(3)) {
         // Persistent failure - possible fault injection
-        trigger_pill_off(0x05); // PILL_OFF_VAULT_CORRUPTION
+        trigger_pill_off(PILL_OFF_VAULT_CORRUPTION);
     }
 
     /* Stage 4: Stack Protection Randomization */
     stack_canary_init(); // Randomize __stack_chk_guard via TRNG
 
     /* Stage 5: Early A-VM Identity Check (Vault is READY) */
-    led_set_pattern(PATTERN_VAULT_READY);
-    if (rcf_vm_execute("BOOT_IDENTITY", (void*)0x0800A000, 2048) != RCF_VM_OK) {
-        trigger_pill_off(0x01); // PILL_OFF_BOOT_INTEGRITY
+    led_set_pattern(LED_PATTERN_SUCCESS);
+    if (rcf_vm_execute("BOOT_IDENTITY", (void*)0x0800A000, 2048) != VM_OK) {
+        trigger_pill_off(PILL_OFF_ACODE); // PILL_OFF_BOOT_INTEGRITY
     }
 
     /* Stage 6: Secure Timechain & Anti-Rollback */
     if (timechain_init() != TC_ERR_OK) {
-        trigger_pill_off(0x04); // PILL_OFF_TAMPER_TIME
+        trigger_pill_off(PILL_OFF_TAMPER); // PILL_OFF_TAMPER_TIME
     }
 
     /* Stage 7: License Validation (Graceful degradation) */
     if (!license_validate()) {
-        led_set_pattern(PATTERN_LICENSE_INVALID);
+        led_set_pattern(LED_PATTERN_ERROR);
     }
 
     /* Stage 8: Communication Interfaces */
@@ -79,7 +80,7 @@ int main(void) {
     pulse_init();
 
     /* Stage 9: Operational Main Loop */
-    led_set_pattern(PATTERN_NEURAL_CYAN);
+    led_set_pattern(LED_PATTERN_IDLE);
     RCF_CI_LOG("RCF RC2 Operational. Entering main loop.");
 
     while (1) {
@@ -87,12 +88,12 @@ int main(void) {
         
         if (pulse_check_activation()) {
             if (pulse_validate_liveness()) {
-                if (protocol_establish_session()) {
-                    led_set_pattern(PATTERN_SESSION_ACTIVE);
+                if (protocol_establish_session() == RCF_OK) {
+                    led_set_pattern(LED_PATTERN_SUCCESS);
                     // deploy_dos_environment();
                 }
             } else {
-                rcf_audit_log(0x45, 0); // EVENT_BIOMETRIC_FAIL
+                rcf_audit_log(EVENT_BIOMETRIC_FAIL, 0); 
                 // Pill-Off logic here if attempts exceeded
             }
         }

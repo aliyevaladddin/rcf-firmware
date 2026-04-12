@@ -1,38 +1,35 @@
 /* 
  * [RCF:NOTICE][RCF:PUBLIC]
- * CI/QEMU conditional compilation & Boot Sequence — v1.3 RC2.
+ * NOTICE: This file is protected under RCF-PL v1.3
+ * Main entry point prototypes and configuration.
  */
 
 #ifndef MAIN_H
 #define MAIN_H
 
 #include "stm32f4xx_hal.h"
-#include "rcf_config.h"
+#include <stdint.h>
+#include <stdbool.h>
 
-/* ─── CI Mode detection ──────────────────────────────────────────────────── */
+/* [RCF v1.3] Hardware Handles (defined in hal_stubs.c) */
+extern RNG_HandleTypeDef hrng;
+extern IWDG_HandleTypeDef hiwdg;
 
+/* [RCF v1.3] CI/QEMU Helpers */
 #ifdef RCF_VM_CI_MODE
-  #include <stdio.h>  /* printf available in QEMU */
-  #define RCF_CI_LOG(msg) printf("[RCF-CI] %s\n", msg)
+    #define RCF_CI_LOG(msg) printf("[RCF-CI] %s\n", msg)
 #else
-  #define RCF_CI_LOG(msg) ((void)0)
+    #define RCF_CI_LOG(msg) ((void)0)
 #endif
 
-/* ─── Security Prototypes ────────────────────────────────────────────────── */
-
-/* TRNG entropy validation */
-void trng_health_check(void);
-
-/* Dynamic stack protection randomization */
-void stack_canary_init(void);
-
-/* Vault initialization with fault-injection resistance */
-bool vault_init_with_retry(uint8_t max_retries);
-
-/* Boot integrity fallback */
+/* System Lifecycle */
+void SystemClock_Config(void);
 void Error_Handler(void);
 
-/* System configuration */
-void SystemClock_Config(void);
+/* Hardware Integrity Stubs */
+void trng_health_check(void);
+void stack_canary_init(void);
+void tamper_init(void);
+void usb_init(void);
 
 #endif /* MAIN_H */
