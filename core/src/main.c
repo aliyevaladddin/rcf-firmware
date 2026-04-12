@@ -37,7 +37,7 @@ int main(void) {
     SystemClock_Config();
     
     // [RCF v1.3] CI/QEMU Log
-    RCF_CI_LOG("RC2 Hardened Boot Sequence Started...");
+    RCF_CI_LOG("RCF v1.3 Hardened Boot Sequence Started...");
 
     led_init();
     led_set_pattern(LED_PATTERN_BOOTING);
