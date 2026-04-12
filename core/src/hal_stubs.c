@@ -99,3 +99,20 @@ void WWDG_IRQHandler(void) {}
 void PVD_IRQHandler(void) {}
 void TAMP_STAMP_IRQHandler(void) {}
 void RTC_WKUP_IRQHandler(void) {}
+
+/* Missing init functions for CI */
+void tamper_init(void) {
+#ifdef RCF_VM_CI_MODE
+    printf("[HAL] Tamper init (stub)\n");
+#endif
+}
+
+void usb_init(void) {
+#ifdef RCF_VM_CI_MODE
+    printf("[HAL] USB init (stub)\n");
+#endif
+}
+
+/* Linker symbol workaround for _sbrk heap management */
+char end asm("end");
+

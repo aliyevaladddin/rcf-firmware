@@ -11,12 +11,8 @@
 #ifdef RCF_VM_CI_MODE
 /* CI stubs — no real crypto, just pass-through for testing */
 
-int rcf_pqc_verify(const uint8_t* sig, const uint8_t* msg, int msg_len, const uint8_t* pk) {
-    (void)sig; (void)msg; (void)msg_len; (void)pk;
-    return 0; /* CI: always pass verification */
-}
-
 void rcf_pqc_keygen(uint8_t* pk, uint8_t* sk) {
+
     for (int i = 0; i < (int)RCF_DILITHIUM2_PK_SIZE; i++) pk[i] = i & 0xFF;
     for (int i = 0; i < (int)RCF_DILITHIUM2_SK_SIZE; i++) sk[i] = (i + 128) & 0xFF;
 }
