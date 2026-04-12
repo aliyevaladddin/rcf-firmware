@@ -12,6 +12,12 @@
 /* Exit — infinite loop (no OS to return to) */
 void _exit(int status) { 
     (void)status; 
+#ifdef RCF_VM_CI_MODE
+    /* ARM Semihosting exit for QEMU */
+    register int r0 __asm__("r0") = 0x18; // SYS_EXIT
+    register int r1 __asm__("r1") = (status == 0) ? 0x20026 : 0x20024;
+    __asm__ volatile("bkpt 0xab" : : "r"(r0), "r"(r1) : "memory");
+#endif
     while(1); 
 }
 

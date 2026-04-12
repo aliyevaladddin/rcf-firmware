@@ -40,8 +40,13 @@ const uint8_t* rcf_vault_get_mpk_public(void) {
 }
 
 bool rcf_vault_is_mpk_locked(void) {
+#ifdef RCF_VM_CI_MODE
+    /* [CI] Always return locked to bypass hardware check in simulation */
+    return true;
+#else
     /* [RCF:RESTRICTED] — Check Lock Byte for OTP MEK Block 15 */
     return (*(volatile uint8_t*)RCF_MPK_LOCK_ADDR & RCF_MPK_LOCK_BIT) != 0;
+#endif
 }
 
 /* ─── Virtual File System ────────────────────────────────────────────────── */
@@ -97,9 +102,16 @@ bool vault_init(void) {
 
 
     /* [RCF v1.3] Option A: Decrypt MPK Public from Flash using OTP MEK */
+#ifdef RCF_VM_CI_MODE
+    /* [CI] Simulation: use stubs instead of OTP/Flash access */
+    const uint8_t mock_mek[32] = {0xAA};
+    const uint8_t* mek = mock_mek;
+    const uint8_t* encrypted_mpk = (const uint8_t*)0x08004000; // Symbolic
+#else
     const uint8_t* mek = (const uint8_t*)RCF_MEK_OTP_ADDR;
-    (void)mek; /* Verified: OTP MEK presence confirmed */
     const uint8_t* encrypted_mpk = (const uint8_t*)RCF_MPK_FLASH_ADDR;
+#endif
+    (void)mek; /* Verified: OTP MEK presence confirmed */
 
     
     /* 

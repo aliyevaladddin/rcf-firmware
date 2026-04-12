@@ -84,9 +84,29 @@ int main(void) {
     led_set_pattern(LED_PATTERN_IDLE);
     RCF_CI_LOG("RCF RC2 Operational. Entering main loop.");
 
+#ifdef RCF_VM_CI_MODE
+    uint32_t ci_cycles = 0;
+    printf("[RCF-CI] Boot Sequence Complete. Entering main loop.\n");
+#endif
+
     while (1) {
+        HAL_IWDG_Refresh(&hiwdg);
         protocol_process();
+        timechain_update();
+
+#ifdef RCF_VM_CI_MODE
+        /* [CI] Periodic Heartbeat and Auto-Exit */
+        if (ci_cycles % 10 == 0) {
+            printf("[RCF-CI] Heartbeat: Cycle %lu, Tick %lu\n", (unsigned long)ci_cycles, (unsigned long)HAL_GetTick());
+        }
         
+        if (ci_cycles++ > 100) {
+            printf("[RCF-CI] Simulation Success: 100 cycles completed. Exiting.\n");
+            extern void _exit(int status);
+            _exit(0); 
+        }
+        HAL_Delay(1); /* Faster simulation */
+#else
         if (pulse_check_activation()) {
             if (pulse_validate_liveness()) {
                 if (protocol_establish_session() == RCF_OK) {

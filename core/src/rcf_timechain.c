@@ -198,7 +198,11 @@ RCF_Timechain_Error timechain_update(void)
 
     e.timestamp_unix      = new_ts;
     e.monotonic_counter   = TC_CURRENT->monotonic_counter + 1U;
+#ifdef RCF_VM_CI_MODE
+    e.subsecond_ticks     = (uint16_t)(HAL_GetTick() & 0xFFFFU);
+#else
     e.subsecond_ticks     = (uint16_t)(RTC->SSR & 0xFFFFU);
+#endif
     e.temperature_celsius = get_internal_temperature();
     e.voltage_mv          = get_vbat_voltage();
     e.power_cycle_count   = TC_CURRENT->power_cycle_count;
@@ -338,10 +342,15 @@ RCF_Timechain_Error timechain_verify_chain(void)
  */
 uint32_t timechain_measure_lsi_hz(void)
 {
+#ifdef RCF_VM_CI_MODE
+    /* CI mock: bypass TIM5 hardware access */
+    (void)0;
+#else
     /* Disable capture, configure IC4 on TI4 */
     TIM5->CCER  &= ~TIM_CCER_CC4E;
     TIM5->CCMR2  =  TIM_CCMR2_CC4S_0;
     TIM5->CCER  |=  TIM_CCER_CC4E;
+#endif
 
     /* Discard initial capture to flush stale value */
     // (void)RTC->SSR; // Placeholder
