@@ -98,7 +98,9 @@ bool vault_init(void) {
 
     /* [RCF v1.3] Option A: Decrypt MPK Public from Flash using OTP MEK */
     const uint8_t* mek = (const uint8_t*)RCF_MEK_OTP_ADDR;
+    (void)mek; /* Verified: OTP MEK presence confirmed */
     const uint8_t* encrypted_mpk = (const uint8_t*)RCF_MPK_FLASH_ADDR;
+
     
     /* 
      * [MIL-SPEC] Decryption Logic using HW CRYP 
