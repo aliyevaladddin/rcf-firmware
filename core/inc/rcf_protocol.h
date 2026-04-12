@@ -18,12 +18,22 @@
 extern "C" {
 #endif
 
+/* [RCF:PUBLIC] — Protocol error codes */
+typedef enum {
+    RCF_OK                  = 0,
+    RCF_ERR_NULL_PTR        = -1,
+    RCF_ERR_INVALID_PARAM   = -2,
+    RCF_ERR_CRYPTO_FAIL     = -3,
+    RCF_ERR_AUTH_FAIL       = -4,
+    RCF_ERR_TIMEOUT         = -5,
+    RCF_ERR_TAMPER          = -6,   /* Physical security violation */
+    RCF_ERR_PILL_OFF        = -7,   /* System zeroized */
+} RCF_Error;
+
 /* ─── Version ────────────────────────────────────────────────────────────── */
 
 #define RCF_PROTOCOL_VERSION_MAJOR  1
 #define RCF_PROTOCOL_VERSION_MINOR  3
-#define RCF_PROTOCOL_VERSION        ((RCF_PROTOCOL_VERSION_MAJOR << 8) | \
-                                      RCF_PROTOCOL_VERSION_MINOR)
 
 /* ─── Magic ──────────────────────────────────────────────────────────────── */
 
@@ -53,9 +63,6 @@ extern "C" {
 
 /* ─── v1.3 Hardened Packet Header (Mil-Spec) ─────────────────────────── */
 
-/**
- * 64-byte aligned header to prevent cache-line timing attacks.
- */
 typedef struct __attribute__((packed, aligned(32))) {
     uint8_t  magic[4];          /* "RCF3" */
     uint16_t version;           /* 0x0103 */
@@ -66,7 +73,6 @@ typedef struct __attribute__((packed, aligned(32))) {
     uint8_t  reserved[14];      /* Padding for 32-byte alignment */
     uint8_t  gcm_tag[16];       /* Auth tag for payload */
     uint8_t  header_mac[16];    /* HMAC-SHA256 of the header metadata */
-    /* Total size: 64 bytes (0x40) */
 } RCF_Packet_Header;
 
 _Static_assert(sizeof(RCF_Packet_Header) == 64, 

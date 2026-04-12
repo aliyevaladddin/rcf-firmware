@@ -52,5 +52,3 @@
 
 #endif /* RCF_OPCODE_H */
 
-
-#endif /* RCF_OPCODE_H */

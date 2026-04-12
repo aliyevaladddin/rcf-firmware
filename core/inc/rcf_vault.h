@@ -65,6 +65,3 @@ void vault_zeroize_all(void);
 
 
 #endif // RCF_VAULT_H
-
-
-#endif // RCF_VAULT_H

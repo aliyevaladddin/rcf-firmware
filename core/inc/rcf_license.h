@@ -1,7 +1,7 @@
 /* 
  * [RCF:NOTICE][RCF:RESTRICTED]
+ * License Validation — Code-Bound.
  * NOTICE: This file is protected under RCF-PL v1.3
- * License Verification & Code Integrity Definitions.
  */
 
 #ifndef RCF_LICENSE_H
@@ -43,7 +43,5 @@ bool license_verify_code_fingerprint(void);
 
 // Renewal
 bool license_update(const RCF_License_Block* new_license);
-
-#endif // RCF_LICENSE_H
 
 #endif // RCF_LICENSE_H
