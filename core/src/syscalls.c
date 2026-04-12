@@ -54,8 +54,16 @@ caddr_t _sbrk(int incr) {
 
 /* File I/O — minimal stubs (no filesystem) */
 int _write(int file, char *ptr, int len) { 
+#ifdef RCF_VM_CI_MODE
+    /* Direct UART1 access for QEMU console (STM32F4 Standard) */
+    for (int i = 0; i < len; i++) {
+        *(volatile uint32_t*)0x40011004 = (uint32_t)ptr[i];
+    }
+    return len;
+#else
     (void)file; (void)ptr; 
     return len; 
+#endif
 }
 
 int _read(int file, char *ptr, int len) { 
