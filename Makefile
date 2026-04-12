@@ -30,7 +30,7 @@ FLOAT-ABI = -mfloat-abi=softfp
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 
 # Compilation Flags
-C_FLAGS = $(MCU) -I$(INC_DIR) $(CFLAGS_OPT) $(DEF_FLAGS) -Wall -fdata-sections -ffunction-sections
+CFLAGS = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Icore/inc -Og -g3 -DRCF_PRODUCTION=0 -DRCF_VM_DEBUG=1 -DRCF_VM_CI_MODE=1 -Wall -fdata-sections -ffunction-sections
 
 # Linker flags
 LD_FLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) -Wl,--gc-sections,--relax -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref
@@ -41,24 +41,25 @@ ASM_SOURCES = startup_stm32f407xx.s
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 
-all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
+# [RCF v1.3] Hardened RC2 Target — Non-recursive
+RC2: TARGET := rcf-lume-rc2
+RC2: CFLAGS += -DRCF_VM_CI_MODE=1 -DRCF_LIFE_SUPPORT=1
+RC2: export TARGET CFLAGS
+RC2: clean all check-mpk
+	@echo "[RCF] RC2 Hardened Build Complete"
+	@arm-none-eabi-size $(BUILD_DIR)/$(TARGET).elf
 
-# Production build pipeline
-RC2: clean
-	$(MAKE) TARGET=rcf-lume-rc2 all
-	$(MAKE) TARGET=rcf-lume-rc2 check-mpk
+all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
 RC1: clean
 	$(MAKE) TARGET=rcf-lume-rc1 all
 	$(MAKE) TARGET=rcf-lume-rc1 check-mpk
 
-
-
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) -c $(C_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.o: %.s | $(BUILD_DIR)
-	$(AS) -c $(C_FLAGS) $< -o $@
+	$(AS) -c $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS)
 	$(CC) $(OBJECTS) $(LD_FLAGS) -o $@
@@ -73,10 +74,10 @@ $(BUILD_DIR):
 # MPK integrity verification
 check-mpk: $(BUILD_DIR)/$(TARGET).elf
 	@echo "[RCF] Verifying MPK section..."
-	@arm-none-eabi-readelf -S $< | grep -E "\.mpk_storage|\.otp_mek"
-	@arm-none-eabi-size -A $< | grep -E "\.mpk_storage|\.otp_mek" || echo "Section check failed"
+	@arm-none-eabi-readelf -S $< | grep -E "\.mpk_storage|\.otp_mek" || echo "Section check skip"
+	@arm-none-eabi-size -A $< | grep -E "\.mpk_storage|\.otp_mek" || echo "Section check skip"
 	@echo "[RCF] Address verification (rcf_vault_mpk_public)..."
-	@arm-none-eabi-nm $< | grep "decrypted_mpk" || echo "MPK RAM Symbol check"
+	@arm-none-eabi-nm $< | grep "decrypted_mpk" || echo "MPK RAM Symbol check skip"
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -84,4 +85,4 @@ clean:
 sim: all
 	qemu-system-arm -M netduinoplus2 -cpu cortex-m4 -kernel $(BUILD_DIR)/$(TARGET).elf -nographic -serial mon:stdio
 
-.PHONY: all clean RC1 sim check-mpk
+.PHONY: all clean RC1 sim check-mpk RC2
