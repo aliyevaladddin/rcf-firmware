@@ -21,12 +21,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc-arm-none-eabi qemu-system-arm python3
 
-    - name: Build Firmware (RC1)
+    - name: Build Firmware (RC2)
       run: |
         make clean
-        make RC1 OPT="-Os" DEBUG="-g"
+        make RC2 OPT="-Os" DEBUG="-g"
 
     - name: Run QEMU Simulation Test
       run: |
-        python3 tests/qemu_verify.py .build/rcf-lume-rc1.elf
+        python3 tests/qemu_verify.py .build/rcf-lume-rc2.elf
 

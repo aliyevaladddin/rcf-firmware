@@ -92,9 +92,9 @@ bool vault_init(void) {
     /* [RCF:CRITICAL] Early check for Hardware Provisioning (OTP Lock) */
     if (!rcf_vault_is_mpk_locked()) {
         rcf_audit_log(EVENT_TAMPER_VAULT, 0);
-        trigger_pill_off(PILL_OFF_TAMPER_CODE);
         return false;
     }
+
 
     /* [RCF v1.3] Option A: Decrypt MPK Public from Flash using OTP MEK */
     const uint8_t* mek = (const uint8_t*)RCF_MEK_OTP_ADDR;

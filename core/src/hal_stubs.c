@@ -9,8 +9,39 @@
 /* Global instances used in main.c */
 RNG_HandleTypeDef hrng;
 IWDG_HandleTypeDef hiwdg;
+uint32_t __stack_chk_guard = 0xDEADBEEF;
+
+/* [RCF v1.3] TRNG Health Check — Protect against hardware fault attacks */
+void trng_health_check(void) {
+    uint32_t trng_test[8];
+    for (int i = 0; i < 8; i++) {
+        HAL_RNG_GenerateRandomNumber(&hrng, &trng_test[i]);
+    }
+    /* Verify entropy (simple check for constants or fault conditions) */
+    if (trng_test[0] == trng_test[1] || trng_test[0] == 0 || trng_test[0] == 0xFFFFFFFF) {
+        // [RCF:CRITICAL] TRNG Fault detected
+        extern void trigger_pill_off(uint8_t reason);
+        trigger_pill_off(0x06); // PILL_OFF_TRNG_FAULT
+    }
+}
+
+/* [RCF v1.3] Stack Canary Randomization */
+void stack_canary_init(void) {
+    uint32_t random_val;
+    HAL_RNG_GenerateRandomNumber(&hrng, &random_val);
+    if (random_val != 0 && random_val != 0xFFFFFFFF) {
+        __stack_chk_guard = random_val;
+    }
+}
+
+/* [RCF:CRITICAL] GCC Stack protection failure handler */
+void __stack_chk_fail(void) {
+    extern void trigger_pill_off(uint8_t reason);
+    trigger_pill_off(0x02); // PILL_OFF_STACK_TAMPER
+}
 
 void HAL_Init(void) {
+
     // Stub
 }
 
