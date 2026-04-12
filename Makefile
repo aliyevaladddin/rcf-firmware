@@ -44,9 +44,10 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
 
 # Production build pipeline
-rc1: clean
-	$(MAKE) TARGET=RC1 all
-	$(MAKE) TARGET=RC1 check-mpk
+RC1: clean
+	$(MAKE) TARGET=rcf-lume-rc1 all
+	$(MAKE) TARGET=rcf-lume-rc1 check-mpk
+
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) -c $(C_FLAGS) $< -o $@
@@ -78,4 +79,4 @@ clean:
 sim: all
 	qemu-system-arm -M netduinoplus2 -cpu cortex-m4 -kernel $(BUILD_DIR)/$(TARGET).elf -nographic -serial mon:stdio
 
-.PHONY: all clean rc1 sim check-mpk
+.PHONY: all clean RC1 sim check-mpk
