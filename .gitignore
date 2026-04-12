@@ -17,4 +17,3 @@ build/
 Thumb.db
 *.tmp
 *.bak
-Makefile
