@@ -75,8 +75,9 @@ bool license_is_valid(void) {
 
 static void compute_code_fingerprint(uint8_t* out_hash) {
     /* [RCF v1.3] Hash .text and .rodata segments */
-    extern uint32_t _stext, _etext, _srodata, _erodata;
+    extern uint32_t _stext, _etext;
     uint32_t text_len = (uint32_t)&_etext - (uint32_t)&_stext;
+
     
     rcf_sha256((uint8_t*)&_stext, text_len, out_hash);
 }
