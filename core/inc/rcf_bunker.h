@@ -32,5 +32,15 @@ uint32_t rcf_bunker_get_entropy(void);
  */
 void rcf_bunker_keygen_dilithium2(void);
 
+/**
+ * @brief Securely stores ephemeral key material during bridge handshake.
+ */
+void rcf_bunker_store_ephemeral(const uint8_t* key, uint32_t len);
+
+/**
+ * @brief Retrieves stored ephemeral key material and clears the buffer.
+ */
+void rcf_bunker_retrieve_ephemeral(uint8_t* out_key, uint32_t len);
+
 
 #endif /* RCF_BUNKER_H */

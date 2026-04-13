@@ -26,6 +26,7 @@ typedef enum {
     PILL_OFF_ACODE = 0x16,             /* A-VM execution violation */
     
     /* Async/Immediate */
+    PILL_OFF_EXTERNAL = 0xEE,          /* Triggered via bridge from dOS */
     PILL_OFF_ASYNC = 0xF0,             /* Asynchronous trigger */
     PILL_OFF_IMMEDIATE = 0xFF          /* Emergency shutdown */
 } PillOff_Reason;

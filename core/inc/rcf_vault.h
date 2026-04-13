@@ -58,6 +58,12 @@ bool           rcf_vault_is_mpk_locked(void);
 void rcf_vault_vfs_store(uint16_t object_id);
 void rcf_vault_vfs_fetch(uint16_t object_id);
 
+/* [RCF v1.3] Bridge Key Storage */
+void rcf_vault_store_bridge_keys(const uint8_t* enc_key, const uint8_t* mac_key);
+
+/* [RCF v1.3] Sentinel MPK Access */
+bool rcf_vault_get_sentinel_mpk(uint8_t* out_mpk, uint32_t len);
+
 
 // Integrity
 bool vault_integrity_check(void);

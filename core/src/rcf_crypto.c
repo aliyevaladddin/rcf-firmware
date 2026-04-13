@@ -54,11 +54,24 @@ void rcf_curve25519_keygen(uint8_t* pk, uint8_t* sk) {
     }
 }
 
-void rcf_curve25519_shared(const uint8_t* sk, const uint8_t* pk, uint8_t* shared) {
-    (void)sk; (void)pk;
     /* CI: mock shared secret */
     for(int i = 0; i < 32; i++) {
         shared[i] = 0xAB;
+    }
+}
+
+void rcf_hkdf_sha256(const uint8_t* salt, uint32_t salt_len,
+                     const uint8_t* ikm, uint32_t ikm_len,
+                     const uint8_t* info, uint32_t info_len,
+                     uint8_t* okm, uint32_t okm_len) {
+    /* CI: Simulating HKDF-SHA256 for testing */
+    uint8_t prk[32];
+    rcf_hmac_sha256(salt, salt_len, ikm, ikm_len, prk);
+    
+    /* Simplified expansion for CI: fills OKM with PRK-derived data */
+    (void)info; (void)info_len;
+    for (uint32_t i = 0; i < okm_len; i++) {
+        okm[i] = prk[i % 32] ^ (uint8_t)i;
     }
 }
 

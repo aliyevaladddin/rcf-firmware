@@ -37,6 +37,13 @@ typedef enum {
     EVENT_TAMPER_VAULT = 0x30,
     EVENT_TIME_ROLLBACK = 0x31,
     EVENT_CLOCK_ANOMALY = 0x32,
+
+    /* [RCF v1.3] Bridge Events */
+    EVENT_BRIDGE_SESSION_START     = 0xA0,
+    EVENT_BRIDGE_PQC_VERIFY_REQ    = 0xA1,
+    EVENT_BRIDGE_PQC_VERIFY_RESULT = 0xA2,
+    EVENT_BRIDGE_ACODE_EXEC        = 0xA3,
+    EVENT_BRIDGE_UNKNOWN_CMD       = 0xAF,
 } AuditEvent;
 
 /* Log event with optional data */

@@ -113,6 +113,32 @@ void usb_init(void) {
 #endif
 }
 
+/* ─── UART HAL for CI/QEMU Bridge ────────────────────────────────────────── */
+
+void hal_uart_send(const uint8_t* data, size_t len) {
+#ifdef RCF_VM_CI_MODE
+    /* Write to stdout which QEMU redirects to the serial socket */
+    for (size_t i = 0; i < len; i++) {
+        putchar(data[i]);
+    }
+    fflush(stdout);
+#endif
+}
+
+bool hal_uart_receive(uint8_t* data, size_t len) {
+#ifdef RCF_VM_CI_MODE
+    /* Read from stdin which QEMU redirects from the serial socket */
+    for (size_t i = 0; i < len; i++) {
+        int c = getchar();
+        if (c == EOF) return false;
+        data[i] = (uint8_t)c;
+    }
+    return true;
+#else
+    return false;
+#endif
+}
+
 /* Linker symbol workaround for _sbrk heap management */
 char end asm("end");
 

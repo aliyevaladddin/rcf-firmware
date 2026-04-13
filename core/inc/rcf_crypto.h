@@ -48,6 +48,13 @@ void rcf_hmac_sha256(const uint8_t* key, uint32_t key_len,
                      const uint8_t* data, uint32_t data_len,
                      uint8_t* mac_out);  /* 32 bytes */
 
+/* ─── HKDF-SHA256 (RFC 5869) ─────────────────────────────────────────── */
+
+void rcf_hkdf_sha256(const uint8_t* salt, uint32_t salt_len,
+                     const uint8_t* ikm, uint32_t ikm_len,
+                     const uint8_t* info, uint32_t info_len,
+                     uint8_t* okm, uint32_t okm_len);
+
 /* ─── Curve25519 ECDH ─────────────────────────────────────────────────── */
 
 void rcf_curve25519_keygen(uint8_t* pk, uint8_t* sk);
