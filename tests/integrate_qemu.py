@@ -3,8 +3,11 @@
 import subprocess, os, signal, sys, threading, time
 
 SOCKET_PATH = "/tmp/rcf_bridge.sock"
-STM32_ELF   = ".build/rcf-lume-rc1.elf"
+STM32_ELF   = os.path.join(os.getcwd(), ".build/rcf-lume-rc1.elf")
+# Try relative first, then absolute codespace path
 ARM64_ELF   = "../ARM64-core/aurora_kernel_qemu.elf"
+if not os.path.exists(ARM64_ELF):
+    ARM64_ELF = "/workspaces/ARM64-core/aurora_kernel_qemu.elf"
 
 # Colors
 CLR_ARM64 = "\033[94m" # Blue
