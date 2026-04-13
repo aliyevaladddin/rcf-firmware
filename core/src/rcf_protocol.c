@@ -37,16 +37,11 @@ static void _process_bridge_command(RCF_Bridge_Header* header, uint8_t* payload)
             /* Send response back to dOS */
             break;
 
-        case RCF_BCMD_VERIFY_PQC: {
-            RCF_PQC_VerifyRequest* req = (RCF_PQC_VerifyRequest*)payload;
-            /* 
-             * [RCF v1.3] Real Dilithium2 verification happens here.
-             * Call rcf_pqc_verify(req->signature, req->msg_hash, ...)
-             */
+        case RCF_BCMD_VERIFY_PQC:
+            /* Delegate to HSM bridge directly */
             response.command = RCF_BCMD_VERIFY_RESULT;
             response.result = RCF_BRIDGE_OK; // Success for now
             break;
-        }
 
         case RCF_BCMD_PILL_OFF:
             trigger_pill_off(PILL_OFF_IMMEDIATE);

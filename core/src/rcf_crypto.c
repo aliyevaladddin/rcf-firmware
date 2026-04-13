@@ -9,18 +9,6 @@
 #include <string.h>
 
 #ifdef RCF_VM_CI_MODE
-/* ─── Dilithium2 PQC ─────────────────────────────────────────────────────── */
-
-int rcf_pqc_verify(const uint8_t* sig, const uint8_t* msg, int msg_len, const uint8_t* pk) {
-    (void)sig; (void)msg; (void)msg_len; (void)pk;
-    return 0; /* CI: Always pass */
-}
-
-void rcf_pqc_keygen(uint8_t* pk, uint8_t* sk) {
-    memset(pk, 0xAA, RCF_DILITHIUM2_PK_SIZE);
-    memset(sk, 0x55, RCF_DILITHIUM2_SK_SIZE);
-}
-
 /* ─── SHA-256 ────────────────────────────────────────────────────────────── */
 
 void rcf_sha256(const uint8_t* data, uint32_t len, uint8_t* hash_out) {
@@ -33,6 +21,23 @@ void rcf_hmac_sha256(const uint8_t* key, uint32_t key_len,
                      uint8_t* mac_out) {
     (void)key; (void)key_len; (void)data; (void)data_len;
     memset(mac_out, 0x22, 32);
+}
+
+/* ─── AES-256-GCM ─────────────────────────────────────────────────────── */
+
+void rcf_aes256_gcm_encrypt(const uint8_t* key, const uint8_t* iv,
+                            const uint8_t* plaintext, uint32_t len,
+                            uint8_t* ciphertext, uint8_t* tag) {
+    (void)key; (void)iv; (void)tag;
+    memcpy(ciphertext, plaintext, len);
+}
+
+bool rcf_aes256_gcm_decrypt(const uint8_t* key, const uint8_t* iv,
+                            const uint8_t* ciphertext, uint32_t len,
+                            const uint8_t* tag, uint8_t* plaintext) {
+    (void)key; (void)iv; (void)tag;
+    memcpy(plaintext, ciphertext, len);
+    return true; /* CI: always pass */
 }
 
 /* ─── HKDF-SHA256 ────────────────────────────────────────────────────────── */
