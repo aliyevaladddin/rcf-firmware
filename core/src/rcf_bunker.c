@@ -26,6 +26,10 @@ static uint8_t __attribute__((section(".ccmram"), aligned(32)))
 static volatile uint32_t __attribute__((section(".ccmram"))) 
     em_noise_state[256];
 
+/* Ephemeral store for bridge handshake (64 bytes) */
+static uint8_t __attribute__((section(".ccmram"))) 
+    eph_storage[64];
+
 static bool bunker_active = false;
 extern RNG_HandleTypeDef hrng;
 

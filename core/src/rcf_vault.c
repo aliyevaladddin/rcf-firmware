@@ -162,3 +162,19 @@ bool vault_load_key(Vault_KeyType type, uint8_t* out_buffer, uint32_t* out_len) 
     return false;
 #endif
 }
+
+/* ─── Bridge Support ─────────────────────────────────────────────────────── */
+
+void rcf_vault_store_bridge_keys(const uint8_t* enc_key, const uint8_t* mac_key) {
+    /* [CI] Simulation: store in RAM (mock secure memory) */
+    (void)enc_key; (void)mac_key;
+#ifdef RCF_VM_CI_MODE
+    /* LOG: keys accepted by Vault */
+#endif
+}
+
+bool rcf_vault_get_sentinel_mpk(uint8_t* out_mpk, uint32_t len) {
+    if (!mpk_ready || len < 1312) return false;
+    memcpy(out_mpk, decrypted_mpk, 1312);
+    return true;
+}
