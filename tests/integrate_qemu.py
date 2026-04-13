@@ -39,7 +39,7 @@ def main():
     # UART2 (1) -> Console (stdio)
     stm32_cmd = [
         "qemu-system-arm", "-M", "netduinoplus2", "-cpu", "cortex-m4", 
-        "-kernel", STM32_ELF, "-nographic", 
+        "-kernel", STM32_ELF, "-display", "none", "-monitor", "none",
         "-serial", f"unix:{SOCKET_PATH},server,nowait", 
         "-serial", "stdio"
     ]
