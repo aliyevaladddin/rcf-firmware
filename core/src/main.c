@@ -93,6 +93,7 @@ int main(void) {
         HAL_IWDG_Refresh(&hiwdg);
         protocol_process();
         timechain_update();
+        rcf_bridge_hsm_process();
 
 #ifdef RCF_VM_CI_MODE
         /* [CI] Periodic Heartbeat and Auto-Exit */

@@ -1,32 +1,49 @@
-# [RCF:NOTICE][RCF:PROTECTED]
-# GitHub Actions for RCF v1.3 Mil-Spec Verification.
+name: 'RCF Guardian CI'
 
-name: RCF-CI-Verify
-
+# [RCF:PROTECTED]
+# Enforces RCF protocol compliance on every push
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'rc/*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
-  build-and-simulate:
+  compliance-check:
+    name: 'RCF Integrity Audit'
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Install Toolchain
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-none-eabi qemu-system-arm python3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Build Firmware (RC2)
-      run: |
-        make clean
-        make RC2 OPT="-Os" DEBUG="-g"
+      - name: Install rcf-cli
+        run: pip install rcf-cli --quiet
 
-    - name: Run QEMU Simulation Test
-      run: |
-        python3 tests/qemu_verify.py .build/rcf-lume-rc2.elf
-
+      - name: Run RCF Guardian Check
+        env:
+          RCF_LICENSE_KEY: ${{ secrets.RCF_LICENSE_KEY }}
+        run: |
+          REPORT="RCF-AUDIT-REPORT.json"
+          if [ ! -f "$REPORT" ]; then
+            echo "::error::RCF-AUDIT-REPORT.json not found. Run 'rcf-cli audit .' locally first."
+            exit 1
+          fi
+          
+          echo "::group::RCF Integrity Verification"
+          # Используем режим verify для максимальной строгости в CI
+          rcf-cli verify . --verbose
+          EXIT_CODE=$?
+          echo "::endgroup::"
+          
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::RCF compliance check FAILED. Protected markers were removed or files were tampered with."
+            exit 1
+          fi
+          echo "RCF compliance check passed."

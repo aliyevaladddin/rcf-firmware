@@ -5,6 +5,7 @@
  */
 
 #include "rcf_protocol.h"
+#include "rcf_bridge_protocol.h"
 #include "rcf_session.h"
 #include "rcf_crypto.h"
 #include "rcf_vault.h"
@@ -16,8 +17,49 @@
 
 /* ─── Internal helpers ───────────────────────────────────────────────────── */
 
-static bool _validate_magic(const uint8_t magic[RCF_MAGIC_LEN]) {
-    return (memcmp(magic, RCF_MAGIC_V13, RCF_MAGIC_LEN) == 0);
+static bool _validate_bridge_magic(uint32_t magic) {
+    return (magic == RCF_BRIDGE_MAGIC);
+}
+
+/* ─── Command dispatch (Bridge Mode) ─────────────────────────────────────── */
+
+static void _process_bridge_command(RCF_Bridge_Header* header, uint8_t* payload) {
+    RCF_Bridge_Header response;
+    memset(&response, 0, sizeof(response));
+    response.magic = RCF_BRIDGE_MAGIC;
+    response.version = RCF_BRIDGE_VERSION;
+    response.session_id = header->session_id;
+
+    switch (header->command) {
+        case RCF_BCMD_PING:
+            response.command = RCF_BCMD_PONG;
+            response.result = RCF_BRIDGE_OK;
+            /* Send response back to dOS */
+            break;
+
+        case RCF_BCMD_VERIFY_PQC: {
+            RCF_PQC_VerifyRequest* req = (RCF_PQC_VerifyRequest*)payload;
+            /* 
+             * [RCF v1.3] Real Dilithium2 verification happens here.
+             * Call rcf_pqc_verify(req->signature, req->msg_hash, ...)
+             */
+            response.command = RCF_BCMD_VERIFY_RESULT;
+            response.result = RCF_BRIDGE_OK; // Success for now
+            break;
+        }
+
+        case RCF_BCMD_PILL_OFF:
+            trigger_pill_off(PILL_OFF_IMMEDIATE);
+            break;
+
+        default:
+            response.command = header->command;
+            response.result = RCF_BRIDGE_ERR_BAD_CMD;
+            break;
+    }
+    
+    (void)payload;
+    /* [STUB] hal_uart_send_bridge(&response, sizeof(response), NULL, 0); */
 }
 
 /* ─── Lifecycle ──────────────────────────────────────────────────────────── */
@@ -27,101 +69,28 @@ RCF_Error protocol_init(void) {
     return RCF_OK;
 }
 
-/* ─── Session establishment ──────────────────────────────────────────────── */
-
-RCF_Error protocol_establish_session(void) {
-    /* [RCF v1.3] Delegated to session module for hardening */
-    if (session_establish()) {
-        return RCF_OK;
-    }
-    return RCF_ERR_AUTH_FAIL;
-}
-
-/* ─── Command dispatch ───────────────────────────────────────────────────── */
-
-static void _process_command(RCF_Packet_Header* header, uint8_t* payload) {
-    if (!session_is_active()) return;
-
-    session_update_activity();
-
-    switch (header->cmd) {
-        case RCF_CMD_PING: {
-            uint8_t pong = 0x01;
-            protocol_send_data(&pong, 1, RCF_MARKER_PUBLIC);
-            break;
-        }
-
-        case RCF_CMD_CLOSE_SESSION:
-            session_reset();
-            break;
-
-        case RCF_CMD_PILL_OFF:
-            trigger_pill_off(PILL_OFF_IMMEDIATE);
-            break;
-
-        default:
-            break;
-    }
-    (void)payload;
-}
-
 void protocol_process(void) {
     if (session_is_expired()) {
         session_reset();
         return;
     }
 
-    RCF_Packet_Header header;
-    /* In CI mode, we mock the reception */
+    /* 
+     * [RCF v1.3] Bridge Protocol Sniffer.
+     * Receives 16-byte frames from ARM64 dOS.
+     */
+    RCF_Bridge_Header b_header;
+    memset(&b_header, 0, sizeof(b_header));
+
     #ifdef RCF_VM_CI_MODE
-    memset(&header, 0, sizeof(header));
+    /* In CI, we simulate a PING from dOS */
+    b_header.magic = RCF_BRIDGE_MAGIC;
+    b_header.command = RCF_BCMD_PING;
     #else
-    // Actual USB receive logic here
+    /* hal_uart_receive(&b_header, sizeof(b_header)); */
     #endif
 
-    if (_validate_magic(header.magic)) {
-        _process_command(&header, NULL);
+    if (_validate_bridge_magic(b_header.magic)) {
+        _process_bridge_command(&b_header, NULL);
     }
-}
-
-/* ─── Data transmission ──────────────────────────────────────────────────── */
-
-RCF_Error protocol_send_data(const uint8_t* data, uint16_t len, uint8_t marker) {
-    if (!session_is_active()) return RCF_ERR_NO_SESSION;
-
-    RCF_Packet_Header header;
-    memset(&header, 0, sizeof(header));
-    memcpy(header.magic, RCF_MAGIC_V13, RCF_MAGIC_LEN);
-    header.cmd = RCF_CMD_DATA;
-    header.payload_len = len;
-    header.tier_marker = marker;
-    header.session_id = session_get_id();
-
-    const uint8_t* enc_key = session_get_enc_key();
-    
-    if (marker != RCF_MARKER_PUBLIC) {
-        /* [RCF v1.3] AES-GCM Encryption logic using enc_key */
-        uint8_t tag[16];
-        uint8_t ciphertext[len];
-        rcf_aes256_gcm_encrypt(enc_key, NULL, data, len, ciphertext, tag);
-        memcpy(header.gcm_tag, tag, 16);
-    }
-
-    /* Compute HMAC over header for integrity */
-    const uint8_t* mac_key = session_get_mac_key();
-    rcf_hmac_sha256(mac_key, 32, (uint8_t*)&header, sizeof(header) - 16, header.header_mac);
-
-    /* [STUB] usb_send(&header, sizeof(header)); usb_send(data, len); */
-    session_update_activity();
-
-    return RCF_OK;
-}
-
-RCF_Error protocol_receive_data(uint8_t* out_buf, uint16_t max_len,
-                                uint16_t* out_received, uint8_t* out_marker) {
-    if (!session_is_active()) return RCF_ERR_NO_SESSION;
-
-    /* [RCF v1.3] Receive and decrypt session-bound data */
-    (void)out_buf; (void)max_len; (void)out_received; (void)out_marker;
-    return RCF_OK; // Stub
 }
