@@ -5,31 +5,28 @@
  */
 
 #include "rcf_crypto.h"
-#include <stdint.h>
-#include <string.h>
+#include "hal_pka.h"
+#include "rcf_config.h"
 
-/**
- * @brief Verifies a Dilithium2 signature.
- * 
- * @param sig Signature buffer (2420 bytes).
- * @param msg Message/Bytecode buffer.
- * @param len Message length.
- * @param pk Public key buffer (1312 bytes).
- * @return 0 on success, non-zero on failure.
- */
 int rcf_pqc_verify(const uint8_t* sig, const uint8_t* msg, int len, const uint8_t* pk) {
     // [RCF-START][M-PQC-VERIFY]
-    // Note: This is a hardware-specific implementation for the Lume/STM32 platform.
-    // Real code would link against the PQC library (Dilithium2).
+    // Загрузка в PKA регистры (Aladdin Spec RC2-LS)
+    hal_pka_load_data(PKA_REG_DATA_IN0, sig, RCF_PQC_SIG_SIZE);
+    hal_pka_load_data(PKA_REG_DATA_IN1, msg, (uint32_t)len);
+    hal_pka_load_data(PKA_REG_DATA_IN2, pk, RCF_PQC_PUBKEY_SIZE);
+    hal_pka_load_data(PKA_REG_LEN_MSG,  NULL, (uint32_t)len);
     
-    // TEMPORARY: Acceptance of all valid-looking signatures for development/integration testing.
-    // TODO: Link with actual dilithium2_verify from core/src/pqc/
+    // Запуск «железа»
+    hal_pka_start();
     
-    if (sig[0] == 0xDE && sig[1] == 0xAD) { // Mock signature pattern check
-        return 0; 
+    // Ожидание (как настоящий polling)
+    while (!hal_pka_is_ready()) {
+        __asm("nop"); 
     }
     
-    // Fail by default in production
-    return -1; 
+    // Чтение результата
+    uint32_t result;
+    hal_pka_read_result(&result);
+    return (result == 0) ? 0 : -1; // 0 = valid signature
     // [RCF-END]
 }

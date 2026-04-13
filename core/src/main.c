@@ -18,6 +18,7 @@
 #include "rcf_vm.h"
 #include "rcf_audit.h"
 #include "rcf_bridge_hsm.h"
+#include "hal_pka.h"
 #include <stdio.h>
 
 /* [RCF v1.3] Retry logic helper */
@@ -41,6 +42,7 @@ int main(void) {
     RCF_CI_LOG("RCF v1.3 Hardened Boot Sequence Started...");
 
     led_init();
+    hal_pka_init();
     led_set_pattern(LED_PATTERN_BOOTING);
 
     /* Stage 1: Entropy Source (Critical for all Crypto) */
