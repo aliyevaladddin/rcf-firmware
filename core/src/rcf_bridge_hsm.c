@@ -20,7 +20,9 @@
 #include "rcf_timechain.h"
 #include "rcf_pilloff.h"
 #include "rcf_audit.h"
+#ifndef RCF_VM_CI_MODE
 #include "usbd_cdc_if.h"
+#endif
 
 #include <string.h>
 

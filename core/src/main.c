@@ -17,6 +17,7 @@
 #include "rcf_modules.h"
 #include "rcf_vm.h"
 #include "rcf_audit.h"
+#include "rcf_bridge_hsm.h"
 #include <stdio.h>
 
 /* [RCF v1.3] Retry logic helper */
