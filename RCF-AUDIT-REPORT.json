@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-04-13T00:24:33.279Z",
+  "audit_type": "RCF-Audit as a Service",
+  "protected_assets": [
+    {
+      "file": "tests/qemu_verify.py",
+      "markers": [
+        "NOTICE",
+        "PROTECTED"
+      ],
+      "sha256": "b363f2d67f6c0f562b7f633db5b53953addfcf96a6be7e882a06879a78504306"
+    }
+  ]
+}
