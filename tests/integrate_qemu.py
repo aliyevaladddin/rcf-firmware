@@ -24,10 +24,10 @@ def cleanup():
     if os.path.exists(SOCKET_PATH): os.remove(SOCKET_PATH)
 
 def monitor_output(process, name, color):
-    while True:
-        line = process.stdout.readline()
+    for line in process.stdout:
         if not line: break
-        print(f"{color}[{name}]{CLR_RESET} {line.strip()}")
+        decoded_line = line.decode('utf-8', errors='replace').strip()
+        print(f"{color}[{name}]{CLR_RESET} {decoded_line}")
 
 def main():
     if os.path.exists(SOCKET_PATH): os.remove(SOCKET_PATH)
