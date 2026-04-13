@@ -35,7 +35,7 @@ def main():
 
     # 1. Start STM32 (HSM)
     stm32_cmd = ["qemu-system-arm", "-M", "netduinoplus2", "-cpu", "cortex-m4", "-kernel", STM32_ELF, "-nographic", "-serial", f"unix:{SOCKET_PATH},server,nowait"]
-    p_stm32 = subprocess.Popen(stm32_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    p_stm32 = subprocess.Popen(stm32_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     processes.append(p_stm32)
     threading.Thread(target=monitor_output, args=(p_stm32, "HSM", CLR_STM32), daemon=True).start()
 
@@ -43,7 +43,7 @@ def main():
 
     # 2. Start ARM64 (dOS)
     arm64_cmd = ["qemu-system-aarch64", "-M", "virt", "-cpu", "cortex-a72", "-kernel", ARM64_ELF, "-nographic", "-serial", "mon:stdio", "-serial", f"unix:{SOCKET_PATH}"]
-    p_arm64 = subprocess.Popen(arm64_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    p_arm64 = subprocess.Popen(arm64_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     processes.append(p_arm64)
     threading.Thread(target=monitor_output, args=(p_arm64, "dOS", CLR_ARM64), daemon=True).start()
 
