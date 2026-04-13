@@ -27,8 +27,6 @@ void HAL_Init(void) {}
 void SystemClock_Config(void) {}
 void tamper_init(void) {}
 void usb_init(void) {}
-void protocol_init(void) {}
-void pulse_init(void) {}
 
 /* Stack & TRNG security (Stubs) */
 void trng_health_check(void) {}
