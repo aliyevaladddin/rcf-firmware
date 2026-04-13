@@ -85,11 +85,11 @@ int main(void) {
 
     /* Stage 9: Operational Main Loop */
     led_set_pattern(LED_PATTERN_IDLE);
-    RCF_CI_LOG("RCF RC2 Operational. Entering main loop.");
+    HSM_LOG("RCF RC2 Operational. Entering main loop.");
 
 #ifdef RCF_VM_CI_MODE
     uint32_t ci_cycles = 0;
-    printf("[RCF-CI] Boot Sequence Complete. Entering main loop.\n");
+    HSM_LOG("Boot Sequence Complete. Running in CI simulation mode.");
 #endif
 
     while (1) {
@@ -101,11 +101,11 @@ int main(void) {
 #ifdef RCF_VM_CI_MODE
         /* [CI] Periodic Heartbeat and Auto-Exit */
         if (ci_cycles % 10 == 0) {
-            printf("[RCF-CI] Heartbeat: Cycle %lu, Tick %lu\n", (unsigned long)ci_cycles, (unsigned long)HAL_GetTick());
+            HSM_LOGF("Simulation Heartbeat: Cycle %lu, Tick %lu", (unsigned long)ci_cycles, (unsigned long)HAL_GetTick());
         }
         
         if (ci_cycles++ > 100) {
-            printf("[RCF-CI] Simulation Success: 100 cycles completed. Exiting.\n");
+            HSM_LOG("Simulation Success: 100 cycles completed. Exiting.");
             extern void _exit(int status);
             _exit(0); 
         }

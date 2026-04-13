@@ -29,18 +29,24 @@ static void _hal_pka_emulate_hardware(void) {
     
     // Simulate slight "hardware" delay
     uint32_t cmd = PKA_REG(PKA_REG_CMD);
-    printf("[PKA] HW Accelerator: Operation %lu started...\n", (unsigned long)cmd);
+    HSM_LOGF("HW Accelerator: Operation %lu started...", (unsigned long)cmd);
 
-    // Read pointers from simulated registers
-    uint8_t* sig = (uint8_t*)(uintptr_t)PKA_REG(PKA_REG_DATA_IN0);
-    
-    // Pattern verification (Mock Logic)
-    if (sig && sig[0] == 0xDE && sig[1] == 0xAD) {
-        printf("[PKA] Result: SIGNATURE VALID (Dilithium2)\n");
-        PKA_REG(PKA_REG_RESULT) = 0; // Success
-    } else {
-        printf("[PKA] Result: SIGNATURE INVALID\n");
-        PKA_REG(PKA_REG_RESULT) = 1; // Failure
+    if (cmd == PKA_CMD_DILITHIUM2_VERIFY) {
+        // Read pointers from "registers"
+        uint8_t* sig = (uint8_t*)(uintptr_t)PKA_REG(PKA_REG_DATA_IN0);
+        uint32_t msg_len = PKA_REG(PKA_REG_LEN_MSG);
+        
+        HSM_LOGF("Context: PK=@0x%08X, SIG=@0x%08X, LEN=%lu", 
+               (unsigned int)PKA_REG(PKA_REG_DATA_IN2), (unsigned int)PKA_REG(PKA_REG_DATA_IN0), (unsigned long)msg_len);
+
+        // Perform simulated hardware verification
+        if (sig && sig[0] == 0xDE && sig[1] == 0xAD) {
+            HSM_LOG("Result: SIGNATURE VALID (Dilithium2)");
+            PKA_REG(PKA_REG_RESULT) = 0; // Success
+        } else {
+            HSM_LOG("Result: SIGNATURE INVALID");
+            PKA_REG(PKA_REG_RESULT) = 1; // Failure
+        }
     }
 
     // [PKA] Complete operation

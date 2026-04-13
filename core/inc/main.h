@@ -16,10 +16,13 @@ extern RNG_HandleTypeDef hrng;
 extern IWDG_HandleTypeDef hiwdg;
 
 /* [RCF v1.3] CI/QEMU Helpers */
-#ifdef RCF_VM_CI_MODE
-    #define RCF_CI_LOG(msg) printf("[RCF-CI] %s\n", msg)
+    #define RCF_CI_LOG(msg) printf("[RCF-CI] %s\r\n", msg)
+    #define HSM_LOG(msg)    printf("[HSM] %s\r\n", msg)
+    #define HSM_LOGF(fmt, ...) printf("[HSM] " fmt "\r\n", ##__VA_ARGS__)
 #else
     #define RCF_CI_LOG(msg) ((void)0)
+    #define HSM_LOG(msg)    ((void)0)
+    #define HSM_LOGF(fmt, ...) ((void)0)
 #endif
 
 /* System Lifecycle */
