@@ -3,11 +3,15 @@
 import subprocess, os, signal, sys, threading, time
 
 SOCKET_PATH = "/tmp/rcf_bridge.sock"
-STM32_ELF   = os.path.join(os.getcwd(), ".build/rcf-lume-rc1.elf")
-# Force absolute path for Codespace environment
+STM32_ELF = os.path.join(os.getcwd(), ".build/rcf-lume-rc1.elf")
+if not os.path.exists(STM32_ELF):
+    build_dir = os.path.join(os.getcwd(), ".build")
+    if os.path.exists(build_dir):
+        elves = [f for f in os.listdir(build_dir) if f.endswith(".elf")]
+        if elves: STM32_ELF = os.path.join(build_dir, elves[0])
+
 ARM64_ELF = "/workspaces/ARM64-core/aurora_kernel_qemu.elf"
 if not os.path.exists(ARM64_ELF):
-    # Fallback for local Mac or other environments
     ARM64_ELF = "../ARM64-core/aurora_kernel_qemu.elf"
 
 # Colors
