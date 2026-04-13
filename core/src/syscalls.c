@@ -53,6 +53,8 @@ caddr_t _sbrk(int incr) {
 }
 
 /* File I/O — minimal stubs (no filesystem) */
+/* _write is now implemented in hal_stubs.c for Dual-UART support */
+#if 0
 int _write(int file, char *ptr, int len) { 
 #ifdef RCF_VM_CI_MODE
     /* Direct UART1 access for QEMU console (STM32F4 Standard) */
@@ -65,6 +67,7 @@ int _write(int file, char *ptr, int len) {
     return len; 
 #endif
 }
+#endif
 
 int _read(int file, char *ptr, int len) { 
     (void)file; (void)ptr; 

@@ -36,4 +36,9 @@ void stack_canary_init(void);
 void tamper_init(void);
 void usb_init(void);
 
+/* HSM Sensor Stubs */
+int16_t get_internal_temperature(void);
+uint32_t get_vbat_voltage(void);
+uint64_t rtc_to_unix(RTC_TimeTypeDef sTime, RTC_DateTypeDef sDate);
+
 #endif /* MAIN_H */
